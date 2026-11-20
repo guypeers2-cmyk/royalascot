@@ -1,0 +1,323 @@
+/* Trackside glass. No bottom navigation: the camera, services and monitor
+   remain available without spending a grid row below the race. */
+#cabinet #viewWindow .feed-top #floorMenuButton{display:grid!important;pointer-events:auto;margin:0}
+#cabinet .gate-audio-key{margin-left:0}#cabinet:is([data-phase=race],[data-phase=gates]) #consoleSound{display:grid;margin-right:0}#cabinet .feed-top{gap:5px}#cabinet .pocket-services .icon{width:18px;height:18px}#cabinet.station-full>.toast{bottom:max(10px,var(--edge-b))}
+#cabinet .has-live-panel .feed-format{display:none}#cabinet .has-live-panel .feed-bottom{right:auto;align-items:flex-start;flex-direction:column-reverse;gap:5px;z-index:5}#cabinet .has-live-panel :is(.orbit-tools,.seat-aim){margin:0}#cabinet .has-live-panel .orbit-tools small{display:none}
+#cabinet #wireReport{display:grid;align-content:center;justify-items:start;gap:2px;background:none;border:0;text-align:left;min-width:0;min-height:36px;max-width:none;width:100%}#wireReport b{font:500 .86rem/1.2 var(--sans)}#wireReport small{font:600 .64rem/1.2 var(--mono);letter-spacing:.06em}#wireReport:is(:hover,:focus-visible) small{text-decoration:underline}
+/* One bottom-right instrument, with one composited surface. Keep the
+   type, numbers, silks and input targets opaque. Sections are in normal flow. */
+#viewWindow{--rail-x:max(12px,env(safe-area-inset-right,0px))}
+#livePanel{position:absolute;z-index:3;right:var(--rail-x);top:auto;width:min(21rem,48cqw);max-height:var(--rail-room,90%);overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;isolation:isolate;border:1px solid #9b957b;border-radius:6px;box-shadow:0 3px 14px #09130f59;background:#182a20;color:#f1f3e9;line-height:1.15;--rail-rule:#e1dfb933;--rail-dim:#e4e8d9;--rail-head:#ffebbd;font-variant-numeric:tabular-nums}
+#livePanel[hidden],#livePanel [hidden]{display:none!important}#livePanel>section{position:static;width:100%;min-width:0;margin:0;padding:0;border:0;border-radius:0;background:transparent}#livePanel #trackTickets{border-top:1px solid #b2a780b3}
+#livePanel header{display:flex;align-items:center;justify-content:space-between;gap:5px;padding:0 8px 0 4px;background:transparent}#livePanel header>small{color:var(--rail-head);font:550 .67rem/1.1 var(--mono);white-space:nowrap}
+#livePanel .track-fold{display:flex;align-items:center;gap:6px;min-height:32px;min-width:0;padding:3px 4px;background:none;border:0;color:#fff4dc;text-align:left;white-space:nowrap}#livePanel .track-fold strong{font:600 .98rem/1.05 var(--serif,Georgia,serif)}#livePanel .track-fold .icon{width:14px;height:14px;color:#eddaaa}#livePanel .track-fold:disabled{opacity:1;cursor:default}.track-fold:disabled .fold-caret{visibility:hidden}.fold-caret{width:6px;height:6px;transform:rotate(45deg);border-bottom:1px solid currentColor;border-right:1px solid currentColor;margin:0 2px 4px}.track-fold[aria-expanded=false] .fold-caret{transform:rotate(225deg);margin:4px 2px 0}.rail-lamp{width:6px;height:6px;border-radius:50%;background:#c6ef9a;box-shadow:0 0 4px #d0f6a780}#livePanel[data-mode=boxed] .rail-lamp{background:#ffe09b}
+#railBoard{padding:0 8px 5px;--rail-cols:1.58rem 1.21rem minmax(0,1fr) minmax(3.5rem,.77fr) 2.18rem 3.5rem}.rail-legend{display:grid;grid-template-columns:var(--rail-cols);gap:5px;color:var(--rail-head);text-transform:uppercase;font:500 .58rem/1.25 var(--mono);letter-spacing:.06em;margin:0 0 3px}.rail-legend span:first-child{grid-column:1/4}.rail-legend span:last-child{grid-column:5/7;text-align:right}#railBoard ol,#trackPaper{list-style:none;padding:0;margin:0}#railBoard li{display:grid;grid-template-columns:var(--rail-cols);align-items:center;gap:5px;min-height:22px;border-top:1px solid var(--rail-rule);font:550 .68rem/1.1 var(--mono)}#railBoard li>small{font-size:.64rem;color:#efefda}#railBoard li>b{min-width:0;overflow-wrap:anywhere;font:600 .8rem/1.08 var(--sans)}#railBoard .rail-style{font:550 .72rem/1.06 var(--sans);color:#e8dfbf;overflow-wrap:normal}#railBoard li>em{font:600 .68rem/1 var(--mono);text-align:right}#railBoard li:first-child>small{color:var(--rail-head)}
+#railBoard li>.rail-drive{display:inline-flex;justify-content:center;align-items:center;min-width:0;padding:2px;border-radius:3px;background:#344538;color:#f1f3e5;font:600 .61rem/1 var(--mono)}.rail-drive abbr{display:none;text-decoration:none}#railBoard [data-drive=active]>.rail-drive{background:#f2cf86;color:#19271f;font-weight:700}#railBoard [data-drive=finished]>.rail-drive{background:#3d4839;color:#ffe7ae}
+:is(.track-legs,.bet-leg,#railBoard) .cloth{display:inline-grid;place-items:center;width:1.4em;height:1.4em;min-width:1.4em;border:1px solid #858774;border-radius:3px;font:700 .79rem/1 var(--sans);font-style:normal}.bet-leg .cloth{vertical-align:.03em;font-size:.77em}.bet-leg{display:inline-block;max-width:100%}.bet-plus{color:#bfaa77}
+/* One outlined slip per ticket. Nothing inside it except its saddlecloths:
+   two adjacent numbers in one outline means a single Quinella, not two bets. */
+#trackPaper{display:flex;flex-wrap:wrap;align-content:start;gap:4px 5px;padding:1px 8px 7px;color:inherit;background:none}
+.track-slip{display:inline-flex;flex:0 0 auto;align-items:center;padding:1px;border:1px solid #a6a4877d;border-radius:5px;background:#0e201bb3}
+.track-legs{display:inline-flex;align-items:center;gap:1px}.track-legs button{position:relative;display:grid;place-items:center;width:32px;height:30px;min-height:0;padding:0;border:0;border-radius:3px;background:transparent;color:inherit;line-height:1}
+#trackPaper .cloth{width:1.55em;height:1.55em;font-size:.9rem;border-color:#b8b99c}.track-legs button:disabled{cursor:default;opacity:1}.track-legs button:not(:disabled):hover{background:#f4e4b022}.track-legs button[aria-pressed=true]{box-shadow:inset 0 0 0 2px #ffe3a0;background:#e7cd8f20}#livePanel button:focus-visible{outline:2px solid #fff0b8;outline-offset:-2px}
+#trackMonitor[data-compact=true] #railBoard{padding:0 4px 4px}#trackMonitor[data-compact=true] .rail-legend,#trackMonitor[data-compact=true] li>b,#trackMonitor[data-compact=true] .rail-drive span{display:none}#trackMonitor[data-compact=true] #railBoard ol{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1px}#trackMonitor[data-compact=true] #railBoard li{grid-template-columns:auto auto;grid-template-rows:auto auto auto auto;align-content:start;justify-content:center;gap:2px 1px;font-size:.6rem;border-top:1px solid var(--rail-rule);padding:2px 0 0}#trackMonitor[data-compact=true] li>small{grid-area:1/1;font-size:.50rem}#trackMonitor[data-compact=true] .cloth{grid-area:1/2;font-size:.67rem}#trackMonitor[data-compact=true] .rail-style{grid-area:2/1/3/3;width:100%;align-content:center;text-align:center;font-size:.58rem;min-height:2.12em}#trackMonitor[data-compact=true] li>em{grid-area:3/1/4/3;font-size:.56rem;text-align:center}#trackMonitor[data-compact=true] li>.rail-drive{grid-area:4/1/5/3;padding:1px 0;font-size:.54rem}#trackMonitor[data-compact=true] .rail-drive abbr{display:inline}
+@media(pointer:coarse){#livePanel .track-fold{min-height:40px}.track-legs button{width:38px;height:36px}}
+@container (max-width:869px){#livePanel{width:min(19.8rem,66cqw)}}
+@container (min-width:870px){#livePanel{width:min(25.75rem,40cqw)}}
+@container (max-width:620px){#viewWindow{--rail-x:6px}#livePanel{right:6px;width:min(21rem,70cqw)}#livePanel header{padding:0 5px 0 2px;gap:3px}#livePanel .track-fold{gap:4px}#livePanel header>small{font-size:.61rem}#trackPaper{padding-inline:4px}#cabinet .has-live-panel .feed-bottom{left:6px;bottom:6px;max-width:calc(29cqw - 8px)}#cabinet .has-live-panel :is(#cameraName,.seat-aim small,.seat-aim>span){display:none}#cabinet .has-live-panel .camera-button:after{content:'View';order:1}#cabinet .has-live-panel .camera-button>span:last-child{order:2}#cabinet .has-live-panel .seat-aim select{max-width:calc(29cqw - 12px)}}
+@container (max-height:360px){#livePanel .track-fold{min-height:25px}#livePanel .track-fold strong{font-size:.88rem}.track-legs button{height:28px;width:32px}}
+@container (max-width:389px){#cabinet .has-live-panel .camera-button{padding-inline:5px;gap:3px;max-width:calc(29cqw - 12px)}#trackMonitor[data-compact=true] #railBoard li{display:flex;align-items:center;flex-direction:column;gap:2px;border-left:1px solid var(--rail-rule)}#trackMonitor[data-compact=true] #railBoard li:first-child{border-left:0}#trackMonitor[data-compact=true] li>.rail-drive{align-self:stretch}#cabinet .race-bug{min-width:0;max-width:calc(100cqw - 165px)}.race-bug-head>b{display:none}.race-bug-data{flex-wrap:wrap;gap:2px 5px}.race-bug-data strong{font-size:.63rem;white-space:normal}}
+#finishSlate[data-pocket=true] .finish-shell{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto;gap:4px;padding:5px}#finishSlate[data-pocket=true] .finish-heading{grid-area:1/1}#finishSlate[data-pocket=true] .finish-tabs{grid-area:2/1;grid-template-columns:repeat(4,minmax(0,1fr));align-content:stretch}#finishSlate[data-pocket=true] #finishArea{grid-area:3/1}#finishSlate[data-pocket=true] .finish-bottom{grid-area:4/1}
+
+/* Six short denomination faces. Keep a forgiving hit area around the face on
+   touch glass. The all-important Place/Start keys and the camera are unchanged. */
+#roundConsole #tubeTicket .tube-coins{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;max-width:19rem;margin-block:2px 5px}
+#roundConsole #tubeTicket .tube-coins:before{display:none}#roundConsole #tubeTicket .tube-coins button{display:grid;align-content:center;width:100%;min-width:0;min-height:32px;padding:0;border:0;background:none;box-shadow:none;font:600 max(12px,.8rem)/1 var(--mono)}
+#roundConsole .tube-coins button>span{display:grid;place-items:center;height:26px;border:1px solid #69909c;border-radius:4px;color:#e6eeeb;background:#233e50}
+#roundConsole .tube-coins button:is(:hover,:focus-visible)>span{border-color:#efe0b6}#roundConsole .tube-coins button[aria-pressed=true]>span{border-color:#fae6ae;background:#e5cc92;color:#172d37}
+@media(pointer:coarse){#roundConsole #tubeTicket .tube-coins button{min-height:40px}}
+/* Cashier slips are immutable-price, single-line records. Never hide a leg,
+   the price, the return or the refund key on narrow glass. */
+#tubeTickets{container:slips / inline-size}
+#roundConsole #tubeTicket #tubeTickets .tube-ticket-line{display:grid;grid-template-areas:none;grid-template-columns:auto auto 1fr auto;align-items:center;gap:4px;padding:2px 0;white-space:nowrap}
+#roundConsole #tubeTickets .tube-ticket-line>*{grid-area:auto}#roundConsole #tubeTickets .slip-cloths,#roundConsole #tubeTickets .slip-terms{display:inline-flex;align-items:center;gap:2px;white-space:nowrap;overflow-wrap:normal}
+#roundConsole #tubeTickets .slip-terms{justify-content:flex-end;font-variant-numeric:tabular-nums}#tubeTickets .slip-terms span{color:#b1bfb6}
+#tubeTickets .slip-market{color:#e2cd97;font:600 .72rem/1 var(--sans)}#tubeTickets .slip-market abbr,#tubeTickets button i{display:none;font-style:normal;text-decoration:none}
+#roundConsole #tubeTickets .bet-leg .cloth{vertical-align:middle}#roundConsole #tubeTickets .tube-ticket-line button{justify-self:end;line-height:1;padding:2px 5px}
+@container slips (max-width:22rem){#roundConsole #tubeTickets button{width:32px;min-width:26px}#tubeTickets button i{display:inline}#tubeTickets button span{display:none}}
+@container slips (max-width:15rem){#tubeTickets .slip-market span{display:none}#tubeTickets .slip-market abbr{display:inline-block;text-align:center;min-width:1.4em;background:#334955;color:#f5dfab;border-radius:2px;padding:2px 0}#roundConsole #tubeTicket #tubeTickets .tube-ticket-line{gap:3px}}
+#chips{grid-template-columns:repeat(6,minmax(0,1fr));gap:2px}#chips .chip{height:40px}#chips .chip svg{width:min(100%,35px);height:35px}#chips .chip.active:before{width:min(100%,39px);height:39px}
+/* Reserve real width for a four-digit Quinella return on the three-pane CRT.
+   At narrower console sizes the existing measured pager shows a full pane. */
+#roundConsole[data-glass=overview] #tubeLayout{grid-template-columns:minmax(0,1.55fr) minmax(0,1.04fr) minmax(16.3rem,.76fr)}
+
+/* Number and colour travel together on every paid leg, including misses.
+   Wrap names between words instead of clipping the second Quinella leg. */
+.paid-pick b{display:flex;flex-wrap:wrap;gap:1px .24em}.receipt-leg{display:inline-flex;align-items:baseline;gap:.22em;min-width:0;max-width:100%}.receipt-leg .cloth{width:1.4em;height:1.4em;border:1px solid #91937b;font:700 .88em/1 var(--sans)}.receipt-plus{color:#cab684}.air-name .air-style{color:#e5dbb9}
+/* A six-across panel is too narrow for real style names on the smallest
+   glass. Use a little form table instead: rank, silk, style, energy, sprint.
+   In shallow landscape use the wider tiles, sharing the last line. */
+@container (max-width:389px){
+ #trackMonitor[data-compact=true] #railBoard ol{display:block}
+ #trackMonitor[data-compact=true] #railBoard li{display:grid;grid-template-columns:2em auto minmax(0,1fr) auto 3.2em;grid-template-rows:auto;align-items:center;gap:3px;padding:1px 0;min-height:0;border-left:0}
+ #trackMonitor[data-compact=true] #railBoard li>:not(b){grid-area:auto}
+ #trackMonitor[data-compact=true] #railBoard .rail-style{min-height:0;text-align:left;font-size:.61rem}
+ #trackMonitor[data-compact=true] #railBoard li>small{font-size:.56rem}#trackMonitor[data-compact=true] #railBoard .cloth{font-size:.65rem;width:1.24em;height:1.24em;min-width:1.24em}
+ #trackMonitor[data-compact=true] #railBoard li>.rail-drive{align-self:center}
+ #livePanel .track-fold{min-height:32px}
+}
+@container (max-height:360px) and (min-width:480px){
+ #livePanel{width:min(23rem,71.5cqw)}
+ #trackMonitor[data-compact=true] #railBoard li{grid-template-rows:auto auto auto;gap:1px 2px}
+ #trackMonitor[data-compact=true] li>em{grid-area:3/1}#trackMonitor[data-compact=true] li>.rail-drive{grid-area:3/2;padding:1px}
+}
+/* Lower-right rail. Docking reserves real grid space: cameras see a new
+   viewport, not an overlay obscuring a different part of the same film. */
+#livePanel{top:auto;bottom:max(6px,env(safe-area-inset-bottom,0px))}#railDock{display:inline-flex;align-items:center;gap:4px;padding:3px 5px;min-height:26px;flex:none;border:1px solid #9e9974;border-radius:4px;background:#25382a;color:#fff1c9;font:600 .66rem/1 var(--sans)}#railDock[aria-pressed=true]{background:#ead8a8;color:#243022}#trackMonitor .rail-lap{margin-left:auto}
+#railBay{grid-area:rail;display:flex;align-items:flex-end;justify-content:flex-end;min-width:0;min-height:0;padding:3px;background:linear-gradient(155deg,#233125,#131e17);border-left:1px solid #5d634d;container-type:size}
+#cabinet.docked-rail:not([data-desk]){grid-template-columns:minmax(0,1fr) clamp(238px,31%,26rem);grid-template-areas:'track rail' 'status status'}#railBay #livePanel{position:relative;inset:auto;width:100%;max-height:100%;box-shadow:none;background:#182a20}#cabinet[data-desk] #railBay{display:none!important}
+@media(max-width:640px) and (orientation:portrait){
+ #cabinet.docked-rail:not([data-desk]){grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) minmax(0,auto) auto;grid-template-areas:'track' 'rail' 'status'}
+ #railBay{container-type:inline-size;max-height:52dvh;padding:2px 5px;border-left:0;border-top:1px solid #60664f}#railBay #livePanel{width:min(100%,28rem);max-height:51dvh}
+ #railBay .track-fold{min-height:27px}#railBay #trackPaper{gap:2px 4px;padding-bottom:3px}#railBay .track-legs button{height:27px;width:29px}
+}
+@media(max-width:400px){#trackMonitor .rail-lap{font-size:.59rem}#railDock{gap:0;padding:3px}#railDock span{display:none}}
+/* Single-sheet betting book, never a carousel of one runner's partners. */
+#dialog:has(.pair-book){height:min(32rem,calc(100dvh - 12px));width:min(38rem,calc(100vw - 12px));background:#192a22}#dialogBody.pair-book{display:grid;grid-template-rows:auto minmax(0,1fr) auto;align-content:stretch;gap:8px}.pair-caption,.pair-foot{font:500 .82rem/1.25 var(--sans);color:#d7dfcd}.pair-caption b{color:#efdcaa}.pair-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr));gap:5px;min-height:0}.pair-grid button{display:flex;align-items:center;justify-content:space-between;gap:3px;min-width:0;min-height:0;padding:5px clamp(4px,1.2vw,10px);border:1px solid #64765c;border-radius:5px;background:linear-gradient(150deg,#304635,#25372b);color:#f7ead1}.pair-grid button:is(:hover,:focus-visible,[aria-pressed=true]){background:#3e4a33;border-color:#edc878}.pair-grid button b{color:#ffe4a6;font:650 1rem/1 var(--mono)}.pair-grid button small{font-size:.75em}.pair-silks{display:inline-flex;align-items:center;gap:2px}.pair-silks>i:not(.cloth){font:500 .66rem var(--mono);color:#aaa986}.pair-silks .cloth{display:inline-grid;place-items:center;width:1.4em;height:1.4em;border:1px solid #a4a487;font:700 .83rem/1 var(--sans)}.pair-foot{border-top:1px solid #52644e;padding-top:6px}
+@media(max-width:440px){.pair-grid button{flex-direction:column;justify-content:center;gap:3px}.pair-caption,.pair-foot{font-size:.74rem}}
+@media(orientation:landscape) and (max-height:460px){.pair-grid{grid-template-columns:repeat(5,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr))}.pair-grid button{flex-direction:column;justify-content:center;padding:2px}.pair-grid{gap:3px}.pair-foot,.pair-caption{font-size:.72rem}}
+.paid-amount .ticket-net{display:block;white-space:nowrap;font:650 .76rem/1.2 var(--mono);color:#c8efb0}.miss .paid-amount .ticket-net{color:#ffb9a4}
+
+#railBay[hidden]{display:none!important}
+@container (max-width:520px){#cabinet[data-phase=gates] #announcement{left:6px;top:8px;transform:none;max-width:calc(100cqw - 158px);padding:4px 6px;gap:3px;font-size:.59rem}#cabinet[data-phase=gates] #announcement b{padding:0;font-size:.88rem}#cabinet[data-phase=gates] .feed-ident{display:none}}
+@container (max-width:19rem){#railBay #railDock span{display:none}#railBay #railDock{min-width:26px;padding:3px;justify-content:center}#railBay #trackMonitor header{gap:3px;padding-inline:4px}}
+
+/* One tap selects; the second on the same denomination can stake it. */
+#quickStakeHint{font:500 .65rem/1.15 var(--sans);color:#d5d8bd;margin-left:auto;text-align:right}#roundConsole .tube-coins button,#chips button{touch-action:manipulation}
+/* WIRELESS EDITION — the two halves share one unbroken glass surface.
+   The booked odds never move; only the right-hand probability column moves. */
+#cabinet #livePanel{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);align-items:start;width:min(51rem,calc(100% - 9rem));max-height:var(--rail-room,90%);overflow-x:clip;overflow-y:auto}#livePanel #trackTickets{grid-column:1;grid-row:1;border:0;border-right:1px solid #d3c79075;align-self:stretch}#livePanel #trackMonitor{grid-column:2;grid-row:1}#livePanel .track-fold strong{color:#fff2d2}#livePanel header>small{letter-spacing:.02em}
+#livePanel #trackPaper{display:grid;gap:0;padding:0 6px;list-style:none;margin:0}#trackTickets{--terms:minmax(0,1fr) 2.4em 2.6em 4.4em 4.4em}.bet-guide,#livePanel #trackPaper .track-slip{display:grid;grid-template-columns:var(--terms);gap:3px;align-items:center}.bet-guide{padding:1px 6px 3px;color:#f2dbaa;font:550 .6rem/1.1 var(--mono);text-align:right;text-transform:uppercase;letter-spacing:.02em}.bet-guide span:first-child{text-align:left}#livePanel .track-slip{background:transparent;border:0;border-top:1px solid var(--rail-rule);border-radius:0;padding:3px 0;min-height:24px;font:600 .75rem/1.1 var(--mono);font-variant-numeric:tabular-nums}
+.rb-pick{display:flex;align-items:center;min-width:0;gap:4px}.rb-type{color:#ecdbad;font:650 .68rem/1.05 var(--sans)}.rb-metric,.rb-chance{text-align:right;white-space:nowrap}.rb-net{color:#c8efbb}.rb-chance{color:#fff2bb}.track-slip[data-result=hit] .rb-chance{color:#d6ffc9}#trackPaper .track-legs{gap:1px}#trackPaper .track-legs button{width:23px;height:24px}.bet-basis,.rail-empty{margin:0;padding:4px 7px 5px;color:#e8e4ce;font:500 max(10px,.62rem)/1.14 var(--sans)}.rail-empty{padding-block:10px;color:#e6eddf}
+#cabinet.docked-rail:not([data-desk]){grid-template-columns:minmax(0,1fr) clamp(24rem,42%,45rem)}#cabinet #railBay #livePanel{width:100%;max-height:100%;background:#182a20}#cabinet .has-live-panel .feed-bottom{max-width:calc(100% - var(--live-width,50%) - 20px)}
+#livePanel[data-size=compact] .track-slip{font-size:max(10px,.65rem)}#livePanel[data-size=compact] .bet-guide{font-size:max(9px,.56rem)}
+#livePanel #trackMonitor[data-compact=true] #railBoard ol{display:flex;flex-direction:column;gap:0}#livePanel #trackMonitor[data-compact=true] #railBoard li{display:grid;grid-template: auto / 1.35em 1.5em minmax(0,1fr) 2.7em 3.1em;align-items:center;justify-content:normal;gap:3px;padding:3px 0;min-height:24px;border-left:0;font:600 max(10px,.66rem)/1 var(--mono)}#livePanel #trackMonitor[data-compact=true] #railBoard li>*{grid-area:auto;margin:0}#livePanel #trackMonitor[data-compact=true] #railBoard li>b{display:none}#livePanel #trackMonitor[data-compact=true] #railBoard .rail-style{min-height:0;width:auto;text-align:left;font:500 max(10px,.63rem)/1.04 var(--sans)}#livePanel #trackMonitor[data-compact=true] #railBoard li>small,#livePanel #trackMonitor[data-compact=true] #railBoard li>em{font-size:inherit}#livePanel #trackMonitor[data-compact=true] .rail-drive{font-size:max(9px,.59rem);align-self:center}
+#livePanel[data-size=pocket] header{gap:2px;padding:0 3px}#livePanel[data-size=pocket] .track-fold{min-width:0;gap:3px;padding:3px 1px}#livePanel[data-size=pocket] .track-fold strong{font-size:max(12px,.78rem)}#livePanel[data-size=pocket] .track-fold>.icon,#livePanel[data-size=pocket] .rail-lamp{display:none}#livePanel[data-size=pocket] .track-count,#livePanel[data-size=pocket] .rail-lap{font-size:max(9px,.56rem)}#livePanel[data-size=pocket] #railDock span{display:none}#livePanel[data-size=pocket] #railDock{min-width:21px;min-height:24px;padding:2px}
+#livePanel[data-size=pocket] .bet-guide{display:none}#livePanel[data-size=pocket] #trackPaper{padding:0 4px}#livePanel[data-size=pocket] #trackPaper .track-slip{grid-template:auto auto / max-content max-content minmax(0,1fr);gap:1px 4px;padding:3px 0;font:600 max(10px,.62rem)/1.06 var(--mono)}#livePanel[data-size=pocket] .rb-pick{grid-area:1/1/2/3}#livePanel[data-size=pocket] .rb-type{font-size:max(10px,.62rem)}#livePanel[data-size=pocket] .rb-chance{grid-area:1/3;align-self:center}#livePanel[data-size=pocket] .rb-metric{font-size:max(10px,.60rem);text-align:left}#livePanel[data-size=pocket] .rb-metric:before{content:attr(data-label) ' ';color:#dfddc4;font:500 max(9px,.55rem)/1 var(--sans)}#livePanel[data-size=pocket] .rb-net{text-align:right}#livePanel[data-size=pocket] .track-legs button{height:21px;width:21px}#livePanel[data-size=pocket] #trackPaper .cloth{font-size:12px}
+#livePanel[data-size=pocket] #trackMonitor[data-compact=true] #railBoard li{grid-template:auto auto / 1.3em 1.5em minmax(0,1fr) 2.3em;gap:1px 3px;min-height:35px}#livePanel[data-size=pocket] #trackMonitor[data-compact=true] #railBoard .rail-style{grid-area:2/1/3/4}#livePanel[data-size=pocket] #trackMonitor[data-compact=true] #railBoard li>em{grid-area:1/3/2/5}#livePanel[data-size=pocket] #trackMonitor[data-compact=true] #railBoard .rail-drive{grid-area:2/4}
+@media(max-width:760px){#cabinet.docked-rail:not([data-desk]){grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto auto;grid-template-areas:'track' 'rail' 'status'}#cabinet #railBay{max-height:51dvh}#cabinet #livePanel{width:calc(100% - 12px)}#cabinet #railBay #livePanel{width:100%;max-height:49dvh}#cabinet .has-live-panel .feed-bottom{bottom:calc(var(--live-height,9rem) + 8px);max-width:calc(100% - 12px);left:6px}#cabinet .has-live-panel .seat-aim,#cabinet .has-live-panel .orbit-tools{flex-direction:row}#livePanel .track-fold{min-height:28px}#livePanel[data-mode=boxed] .rail-lap{max-width:4.4em;white-space:normal}}
+@media(max-height:420px) and (orientation:landscape){#livePanel .track-fold{min-height:24px}#livePanel[data-size=compact] #trackPaper .track-slip,#livePanel #trackMonitor[data-compact=true] #railBoard li{min-height:17px;padding-block:1px}#livePanel[data-size=compact] #trackPaper .track-legs button{height:18px}#livePanel .bet-basis{padding-block:2px}}
+#livePanel #trackTickets{--terms:minmax(0,1fr) 11% 11% 18% 18%}.bet-guide{font-size:max(9px,.62rem);letter-spacing:0}#livePanel[data-size=full] .track-slip{font-size:max(12px,.81rem)}#livePanel[data-size=full] .rb-type{font-size:.78rem}#livePanel[data-size=full] #railBoard li{min-height:31px}#livePanel[data-size=full] #railBoard li>b{font-size:.85rem}#livePanel[data-size=full] #railBoard .rail-style{font-size:.74rem}
+#livePanel #trackPaper .track-legs button{display:grid;align-items:center;justify-content:center;overflow:visible;line-height:1;padding:0}#livePanel #trackPaper .track-legs button .cloth{box-sizing:border-box;min-width:0;min-height:0;width:18px;height:19px;font:700 12px/1 var(--sans)}#livePanel #trackMonitor[data-compact=true] #railBoard li{grid-template-columns:2.05em 1.5em minmax(0,1fr) 2.7em 3.1em}#livePanel[data-size=compact] .rb-type{font-size:max(10px,.61rem)}#livePanel[data-size=compact] .rb-pick{gap:2px}
+#livePanel[data-size=pocket] #trackMonitor[data-compact=true] #railBoard li{grid-template-columns:2.1em 1.5em minmax(0,1fr) 2.4em}#livePanel[data-size=pocket] .rb-metric:before{content:none}#livePanel[data-size=pocket] .rb-odds:before{content:'@ ';color:#d2d4c2}#livePanel[data-size=pocket] #trackPaper .track-slip{grid-template-columns:max-content minmax(0,1fr) auto;row-gap:0;padding:2px 0;min-height:32px}#livePanel[data-size=pocket] .rb-type{font-size:max(10px,.56rem)}#livePanel[data-size=pocket] .track-legs button{height:18px;width:18px}#livePanel[data-size=pocket] #trackPaper .track-legs button .cloth{width:16px;height:16px;font-size:11px}#livePanel[data-size=pocket] .rb-chance{font-size:max(10px,.62rem)}#livePanel[data-size=pocket] .rb-net{justify-self:end}#livePanel[data-size=pocket] #trackMonitor header>small{margin-left:auto}#livePanel[data-size=pocket] #railDock{min-width:20px}#livePanel[data-size=pocket] #trackMonitor .fold-caret{display:none}.rb-key{display:none}#livePanel[data-size=pocket] .rb-key{display:block;font:500 max(9px,.52rem)/1.06 var(--sans);padding-top:1px}
+@media (orientation:landscape) and (max-width:760px) and (min-width:450px) and (max-height:435px){#cabinet .has-live-panel .feed-bottom{top:5px;bottom:auto;left:47%;transform:translateX(-50%);align-items:center;max-width:26cqw}#cabinet .has-live-panel .feed-bottom .camera-button{max-width:none}#livePanel[data-size=compact] #trackPaper .track-legs button .cloth{width:16px;height:16px;font-size:11px}}
+#airTickets>.air-ticket{width:100%;max-width:100%;box-sizing:border-box;flex:none;display:grid;grid-template: auto auto/minmax(0,.8fr) minmax(0,.85fr) minmax(0,1.25fr) minmax(0,1.15fr);gap:2px 7px;padding:5px 9px 7px;background:#182b21;border:1px solid #66785c;border-radius:4px;color:#f5efdb}#airTickets .rb-pick{grid-column:1 / -1;gap:8px}#airTickets .rb-type{font:600 1.02rem/1.12 var(--serif);color:#ffe2a0}#airTickets .track-legs{display:flex;align-items:center;gap:2px}#airTickets .rb-metric,#airTickets .rb-chance{display:block;min-width:0;font:650 max(12px,.86rem)/1.05 var(--mono);text-align:left}#airTickets .rb-metric:before,#airTickets .rb-chance:before{display:block;content:attr(data-label);color:#d6d9bd;margin-bottom:2px;font:500 max(10px,.68rem)/1.1 var(--sans)}#airTickets .rb-net:before{content:'Net if hit'}#airTickets .rb-chance:before{content:'Hit chance'}#airTickets .air-ticket[data-result=hit] .rb-chance{color:#d6ffc9}#airTickets .air-leg .cloth{display:grid;place-items:center}#airTickets .rb-net{color:#c8efbb}#livePanel[data-size=pocket] .rb-pick{gap:2px}#livePanel[data-size=pocket] .bet-basis{line-height:1.05}
+@media(max-height:450px) and (orientation:landscape){#airTickets>.air-ticket{gap:0 4px;padding:2px 5px}#airTickets .rb-type{font-size:.88rem}#airTickets .air-leg{min-height:30px;height:30px}#airTickets .rb-metric:before,#airTickets .rb-chance:before{margin-bottom:0}}
+#cabinet #livePanel #trackPaper .track-legs button{min-height:24px;min-width:24px}#livePanel[data-size=pocket] #trackPaper .rb-pick{width:max-content;max-width:100%;flex-shrink:0}
+@media(max-height:420px) and (orientation:landscape){#livePanel[data-size=compact] #trackPaper .track-slip{padding:0;min-height:24px}#livePanel[data-size=compact] .bet-guide{padding-block:0}#livePanel[data-size=compact] .bet-basis{padding-block:1px}}
+#livePanel[data-size=pocket] #trackMonitor[data-compact=true] #railBoard li{grid-template-columns:2.1em 1.5em minmax(0,1fr) 3.05em}#livePanel[data-size=pocket] #trackMonitor .rail-drive{max-width:100%;padding-inline:0}
+@media(max-width:400px) and (max-height:590px) and (orientation:portrait){#cabinet #viewWindow.has-live-panel:has(#raceBug:not([hidden])) .feed-bottom{right:6px;left:auto;top:53px;bottom:auto;max-width:42cqw}}
+@media(max-width:760px){#cabinet #railBay{container-type:inline-size;max-height:73dvh}#cabinet #railBay #livePanel{max-height:72dvh}}
+
+#airTickets .rb-names{min-width:0;color:#e5ead8;font:550 max(11px,.78rem)/1.2 var(--sans);overflow-wrap:anywhere}#airTickets .rb-type,#airTickets .track-legs{flex:none}
+/* The preceding scale was .8: ten percent more on each axis is .88.
+   Scale percentage widths and the dock bay too, not just the typography. */
+#cabinet #livePanel{zoom:.88;width:min(51rem,calc(88% - 9rem))}#cabinet.docked-rail:not([data-desk]){grid-template-columns:minmax(0,1fr) clamp(21.12rem,36.96%,39.6rem)}#cabinet #railBay #livePanel{width:100%}
+@media(max-width:760px){#cabinet #livePanel{width:calc(88% - 12px)}#cabinet.docked-rail:not([data-desk]){grid-template-columns:minmax(0,1fr)}#cabinet #railBay #livePanel{width:88%;margin-inline:auto}}
+#cabinet #livePanel #trackPaper .track-legs button{min-width:30px;width:30px;min-height:30px;height:30px;margin-block:-3px}
+#railBoard [data-drive=saving]>.rail-drive,[data-drive=saving] .drive-lozenge,.dossier-now[data-drive=saving],#fileDrive[data-drive=saving]{background-color:rgba(34,115,66,.75);color:#fff}#railBoard [data-drive=active]>.rail-drive,[data-drive=active] .drive-lozenge,#fileDrive[data-drive=active]{background-color:#ffdf43;color:#242008}#railBoard [data-drive=spent]>.rail-drive,[data-drive=spent] .drive-lozenge,.dossier-now[data-drive=spent],#fileDrive[data-drive=spent]{background-color:rgba(158,46,48,.75);color:#fff}
+.drive-lozenge{padding:1px 4px;border-radius:3px;font:600 .7rem/1.05 var(--sans)}#statHelp{position:fixed;z-index:1001;max-width:min(17.5rem,calc(100vw - 16px));padding:8px 11px;border:1px solid #b39d71;border-radius:5px;pointer-events:none;margin:0;background:#152824;color:#f6efdc;box-shadow:0 4px 16px #0006;font:500 max(12px,.78rem)/1.35 var(--sans)}#statHelp strong,#statHelp span{display:block}#statHelp strong{color:#f5d79b;margin-bottom:2px}#statHelp[hidden]{display:none}
+
+#fileDrive[data-drive]{padding:2px 5px;border-radius:3px}
+/* In a 320px glass the stall countdown and Dock key share the monitor
+   heading. Let the title break between words instead of overprinting them. */
+#livePanel[data-size=pocket] #trackMonitor .track-fold strong{min-width:0;white-space:normal;text-align:left;line-height:1.02}
+#cabinet #livePanel :is(.track-fold,#railDock){min-height:30px}#cabinet #livePanel #railDock{min-width:30px;justify-content:center}
+/* A shallow dock uses the width for the book and leaves the centre of the
+   film to the start rack. Put the timer above the camera key, not over lane 3. */
+@media(orientation:landscape) and (max-width:760px) and (max-height:435px){
+ #cabinet.docked-rail[data-phase=gates] #announcement,#cabinet[data-phase=gates] #viewWindow.has-live-panel #announcement{left:7px;right:auto;top:5px;transform:none;padding:3px 6px;max-width:36cqw;gap:4px}
+ #cabinet.docked-rail #viewWindow .feed-ident,#cabinet[data-phase=gates] #viewWindow.has-live-panel .feed-ident{display:none}
+ #cabinet.docked-rail:not(.console-stage):not(.finish-stage)>.race-strip{height:32px;min-height:32px;padding-block:0}#cabinet.docked-rail>.race-strip .race-timer{line-height:1}#cabinet.docked-rail>.race-strip .race-timer span{font-size:9px}#cabinet.docked-rail>.race-strip .race-timer b{font-size:15px}
+}
+@media(orientation:landscape) and (max-width:760px) and (max-height:435px){
+ #cabinet #livePanel[data-size=compact] #trackPaper .track-slip{min-height:30px;padding-block:0;border:0;box-shadow:inset 0 -1px 0 #57644d}
+ #cabinet #livePanel[data-size=compact] #trackPaper .track-legs{height:30px;align-self:center}
+ #cabinet #livePanel[data-size=compact] #trackPaper .track-legs button{margin-block:0}
+ /* The six style rows are shorter than six touch targets. Use the spare
+    line UNDER those rows for the annotation, not for a seventh ticket. */
+ #cabinet #livePanel[data-size=compact]:has(#trackPaper:not([hidden]) li:nth-child(6)) #betBasis{position:absolute;left:53%;bottom:1px;right:12%;max-width:35%;margin:0;padding:1px 2px;line-height:1.05}
+ #cabinet.docked-rail[data-phase=gates]:not(.console-stage):not(.finish-stage)>.race-strip{height:25px;min-height:25px}
+ #cabinet.docked-rail[data-phase=gates] .race-strip .race-timer{display:flex;align-items:center;gap:6px}
+ #cabinet.docked-rail[data-phase=gates] #timerValue,#cabinet.docked-rail[data-phase=gates] #timerLabel{line-height:1}
+}
+
+@media(orientation:landscape) and (max-width:760px) and (max-height:435px){
+ #cabinet.docked-rail #railBay{padding-block:1px}
+ /* My bets doubles as the first column heading: six non-overlapping 24px
+    pairs plus header stay reachable in a short dock. */
+ #cabinet #livePanel[data-size=compact]:has(#trackPaper:not([hidden]) li:nth-child(6)) .bet-guide{position:absolute;inset:0 auto auto 0;width:51.92%;height:30px;box-sizing:border-box;align-items:center;pointer-events:none}
+ #cabinet #livePanel[data-size=compact]:has(#trackPaper:not([hidden]) li:nth-child(6)) .bet-guide span:first-child{visibility:hidden}
+ #cabinet #livePanel[data-size=compact]:has(#trackPaper:not([hidden]) li:nth-child(6)) .track-count{position:absolute;right:4px;bottom:3px}
+}
+
+/* In a 320px-high landscape dock, leave the full boxed field its 110px
+   window even with all six pair tickets. Only the passive status line is
+   shortened; neither a tap target nor the teams are scaled down. */
+@media(orientation:landscape) and (max-width:760px) and (max-height:340px){
+ #cabinet.docked-rail[data-phase=gates]:not(.console-stage):not(.finish-stage)>.race-strip{height:20px;min-height:20px}
+ #cabinet.docked-rail[data-phase=gates]>.race-strip .strip-sub{display:none}
+}
+
+/* Relative to the previous racing glass, widen only the monitor by 5%.
+   The ticket fraction stays .864; borders and dock padding are not scaled. */
+#cabinet{--live-book-scale:.9201923077;--overlay-book:min(51rem,calc(88% - 9rem))}
+#cabinet #viewWindow #livePanel[data-mode=race]{width:calc((var(--overlay-book) - 2px) * var(--live-book-scale) + 2px)}
+#cabinet #livePanel[data-mode=race]{grid-template-columns:minmax(0,.864fr) minmax(0,1.05fr)}
+@media(min-width:761px){#cabinet.docked-rail[data-phase=race]:not([data-desk]){grid-template-columns:minmax(0,1fr) calc((clamp(21.12rem,36.96%,39.6rem) - 9px) * var(--live-book-scale) + 9px)}}
+@media(max-width:760px){#cabinet{--overlay-book:calc(88% - 12px)}#cabinet #railBay #livePanel[data-mode=race]{width:calc((88% - 2px) * var(--live-book-scale) + 2px)}}
+.stop-follow{flex:none;min-height:30px;padding:2px 6px;border:1px solid #aca07b;border-radius:4px;background:#26382a;color:#ffebac;font:650 max(11px,.68rem)/1.05 var(--sans);cursor:pointer}
+.stop-follow:not(:disabled):hover{background:#f1dea8;color:#202b22}.stop-follow:disabled{color:#bdbfae;border-color:#677260;background:transparent;cursor:default}.ticket-heading .stop-follow{margin-left:auto}
+#livePanel[data-mode=race] #trackTickets header{gap:3px;padding-inline:4px}#livePanel[data-mode=race] .track-count{margin-inline-start:auto}#livePanel[data-mode=race] #trackTickets{--terms:minmax(0,1fr) 10% 12% 16% 16%}
+#livePanel[data-mode=race] :is(.bet-guide,.track-slip){column-gap:2px}#livePanel[data-mode=race] .rb-pick{gap:2px}
+/* A short two-line stub: both large silk targets at the left, type and
+   chance above the price and possible net. No ellipses on a booked term. */
+#livePanel[data-mode=race] #trackTickets:not([data-paper=table]) .bet-guide{display:none}
+#livePanel[data-mode=race] #trackTickets:not([data-paper=table]) .rb-key{display:block}
+#livePanel[data-mode=race] #trackTickets:not([data-paper=table]) .track-fold :is(.icon,.fold-caret){display:none}
+#livePanel[data-mode=race] #trackTickets:not([data-paper=table]) #trackPaper{padding-inline:3px}
+#livePanel[data-mode=race] #trackTickets:not([data-paper=table]) #trackPaper .track-slip{grid-template:auto auto / max-content max-content minmax(0,1fr) max-content;gap:0 3px;align-content:center;min-height:30px;font:600 max(11px,.60rem)/1.06 var(--mono)}
+#livePanel[data-mode=race] #trackTickets:not([data-paper=table]) .rb-pick{display:contents}
+#livePanel[data-mode=race] #trackTickets:not([data-paper=table]) .track-legs{grid-area:1/1/3/2;align-self:center}
+#livePanel[data-mode=race] #trackTickets:not([data-paper=table]) .rb-type{grid-area:1/2/2/4;justify-self:start;font:650 max(11px,.65rem)/1 var(--sans)}
+#livePanel[data-mode=race] #trackTickets:not([data-paper=table]) .rb-chance{grid-area:1/4;justify-self:end;font:inherit}
+#livePanel[data-mode=race] #trackTickets:not([data-paper=table]) .rb-stake{grid-area:2/2;text-align:left;font:inherit}
+#livePanel[data-mode=race] #trackTickets:not([data-paper=table]) .rb-odds{grid-area:2/3;text-align:left;font:inherit}
+#livePanel[data-mode=race] #trackTickets:not([data-paper=table]) .rb-odds:before{content:'@';color:#cbcfbb}
+#livePanel[data-mode=race] #trackTickets:not([data-paper=table]) .rb-net{grid-area:2/4;justify-self:end;font:inherit}
+/* Pocket stub: name of market and chance on the left, silks on the right.
+   Three amounts get their own full-width line below the two touch targets. */
+#livePanel[data-mode=race] #trackTickets[data-paper=narrow] header{display:grid;grid-template-columns:minmax(0,1fr) min(43%,4rem);grid-template-areas:'fold stop' 'count stop';gap:0 2px;padding-block:2px}
+#cabinet #livePanel[data-mode=race] #trackTickets[data-paper=narrow] .track-fold{grid-area:fold;grid-row:1/3;align-self:stretch;align-items:flex-start;padding:1px 0 11px;min-height:30px;gap:0}
+#livePanel[data-mode=race] #trackTickets[data-paper=narrow] .track-count{grid-area:count;pointer-events:none;margin:0;justify-self:start;font:500 max(9px,.53rem)/1 var(--mono)}
+#livePanel[data-mode=race] #trackTickets[data-paper=narrow] .stop-follow{grid-area:stop;width:100%;min-width:0;max-width:100%;white-space:normal;padding-inline:0}
+#livePanel[data-mode=race] #trackTickets[data-paper=narrow] #trackPaper .track-slip{grid-template:auto auto auto / max-content max-content minmax(0,1fr);padding-block:1px;gap:0 2px}
+#livePanel[data-mode=race] #trackTickets[data-paper=narrow] .track-legs{grid-area:1/1/3/-1;justify-self:end;height:30px}
+#livePanel[data-mode=race] #trackTickets[data-paper=narrow] .rb-type{grid-area:1/1/2/-1;align-self:end}
+#livePanel[data-mode=race] #trackTickets[data-paper=narrow] .rb-chance{grid-area:2/1/3/-1;justify-self:start;align-self:start}
+#livePanel[data-mode=race] #trackTickets[data-paper=narrow] .rb-stake{grid-area:3/1}#livePanel[data-mode=race] #trackTickets[data-paper=narrow] .rb-odds{grid-area:3/2}#livePanel[data-mode=race] #trackTickets[data-paper=narrow] .rb-net{grid-area:3/3;min-width:0;white-space:normal;overflow-wrap:anywhere}
+#livePanel[data-mode=race] #trackMonitor[data-compact=true] .rail-legend{display:flex;align-items:baseline;justify-content:space-between;gap:1px;font-size:max(9px,.51rem);letter-spacing:0;margin-bottom:1px}
+#livePanel[data-mode=race] #trackMonitor[data-compact=true] .rail-legend span:nth-child(2){display:none}
+@media(orientation:landscape) and (max-width:760px) and (max-height:435px){
+ #cabinet #livePanel[data-mode=race][data-size=compact]:has(#trackPaper:not([hidden]) li:nth-child(6)) .bet-guide{display:none}
+ #cabinet #livePanel[data-mode=race][data-size=compact]:has(#trackPaper:not([hidden]) li:nth-child(6)) .track-count{position:static}
+ #cabinet #livePanel[data-mode=race][data-size=compact]:has(#trackPaper:not([hidden]) li:nth-child(6)) #betBasis{left:47%;right:1%;max-width:none}
+ #cabinet #livePanel[data-mode=race][data-size=compact]:has(#trackPaper:not([hidden]) li:nth-child(6)) .rb-key{display:block}
+}
+
+#livePanel .stub-note{display:none}
+#livePanel[data-mode=race] #trackTickets[data-paper=narrow] :is(.rb-stake,.rb-odds,.rb-net){font:650 max(11px,.58rem)/1.06 var(--sans);font-variant-numeric:tabular-nums}
+#livePanel[data-mode=race] #trackTickets[data-paper=narrow] .bet-basis{padding:2px 3px;line-height:1.07}
+#livePanel[data-mode=race] #trackTickets[data-paper=narrow] .bet-basis>span:not(.stub-note){display:none}
+#livePanel[data-mode=race] #trackTickets[data-paper=narrow] .stub-note,#livePanel .stub-note>span{display:block}#livePanel .stub-note i{font-style:normal}
+#livePanel[data-mode=race][data-size=pocket] .rail-legend span:first-child{font-size:0}#livePanel[data-mode=race][data-size=pocket] .rail-legend span:first-child:after{content:'Rank';font-size:max(9px,.51rem)}
+
+/* Official field: the six finishers are the result, not a three-horse
+   podium with the rest on a different sheet. Size against its own glass:
+   a narrow receipt column and a tall phone are not the same viewport. */
+#finishSlate #officialGrid{height:100%;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);align-items:stretch}
+#finishSlate.board-wide #officialGrid{grid-template-columns:minmax(0,1.18fr) minmax(0,1fr)}
+#finishSlate .official-placings{display:flex;flex-direction:column;height:100%;min-height:0}#finishSlate .official-placings>#officialRecent{flex:none}
+.finish-field{flex:1;min-height:0;min-width:0;container:finishers / size}
+/* Flat official register, one continuous sheet. No portraits, tiles or rating grids. */
+.finish-list{margin:0 auto;padding:0;list-style:none;width:100%;height:100%;display:grid;grid-template-rows:repeat(6,minmax(0,1fr));background:#1a3028;color:#f5f0df;border-top:2px solid #c7a366;overflow:auto}
+.finish-row{min-width:0;display:grid;grid-template-columns:3.1em 1.65em minmax(0,1fr) auto;align-items:center;gap:clamp(5px,1.5cqw,16px);padding:0 clamp(5px,2cqw,20px);border-bottom:1px solid #6673636b;font:600 clamp(13px,1.1rem,21px)/1.12 var(--sans)}
+.finish-row:first-child{background:#344337;box-shadow:inset 3px 0 #d9b472}.finish-row .place{color:#dad8b9;font:italic 600 1.12em/1 Georgia,serif}.finish-row:first-child .place{color:#ffdb8d}.finish-row .cloth{width:1.5em;height:1.5em;border:1px solid #bcba9d80;font:650 .85em/1 var(--mono);border-radius:2px}.finish-row b{font-weight:600;line-height:1.35;overflow-wrap:anywhere}.finish-row time{color:#e3d4ad;font:550 .8em/1 var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}.finish-row:focus-visible{outline:2px solid #f4d390;outline-offset:-2px}
+@container finishers (max-height:240px){.finish-row{font-size:clamp(12px,.86rem,16px);grid-template-columns:2.7em 1.4em minmax(0,1fr) auto}.finish-row .cloth{width:1.28em;height:1.28em}}
+#dialogBody.paper-six #folioRows>.finish-field{flex:1;min-height:0}
+
+/* Moving pixels don't need to be blurred again underneath every HUD key. */
+#viewWindow[data-action-renderer] :is(.live-label,.cam-label,.glass-square,.camera-button,.race-announcement,.race-finish){backdrop-filter:none;-webkit-backdrop-filter:none}#viewWindow[data-action-renderer=film] #tableCanvas{will-change:transform}
+/* Only the substrate is translucent. Never dim numerals, wager keys or silks. */
+#cabinet #livePanel{background:rgba(10,24,19,.25);opacity:1;text-shadow:0 1px 2px #06120f,0 0 2px #06120f}
+#livePanel .cloth,#livePanel .rail-drive{text-shadow:none}
+#dialog .quality-desk{border-color:#797a56;border-top:2px solid #b99b60;background:linear-gradient(145deg,#253b2e,#192b23)}
+.quality-head,.quality-switches{display:flex;align-items:center;gap:6px 16px;flex-wrap:wrap}.quality-head{justify-content:space-between}.quality-desk #qualityStatus{color:#e5d6b3;font:600 .68rem var(--mono);text-transform:uppercase;letter-spacing:.025em}
+.quality-switches{align-items:end;margin:4px 0 7px}.quality-switches label{display:grid;gap:4px;flex:1 1 8rem;min-width:0;font:600 .78rem var(--sans);color:#efeddf}.quality-switches select{width:100%;min-width:0;min-height:32px;color:#ffefcc;background:#17271e;border:1px solid #8e8e6c;border-radius:3px;font:600 .83rem var(--sans);padding:3px 5px}.quality-switches select:focus-visible{outline:2px solid #edc776;outline-offset:1px}
+/* Horse dossiers are opaque stock, not another pane of track glass. Keep an
+   actual colour below every print, also on the formerly unbacked live file. */
+#runnerCards .horse-card{opacity:1;background:#1e2921;color:#efe9d7}#runnerCards .horse-card:hover{background:#27352a}#runnerCards .horse-card.selected{background:#343b28;border-color:#c6af78}
+#horsePeek,#fileCard,.starter,:is(#tubeProfile,#terminalProfile) .runner-card{opacity:1;mix-blend-mode:normal;isolation:isolate}
+#horsePeek{background:#203428}#fileCard{background:#203227;border:1px solid #53664e;border-radius:4px}.starter{background-color:#24372b}
+#roundConsole #tubeRows .field-entry{opacity:1;background-color:#203c4d}#roundConsole #tubeRows .field-entry[aria-pressed=true]{background-color:#294547}
+
+/* Picture desk shortcut on the same instrument strip as fullscreen. */
+.quality-wrap,.action-wrap{position:relative;flex:none}.quality-key{display:inline-flex;align-items:center;justify-content:center;gap:4px;width:auto;min-width:31px;padding:0 7px}.quality-key>[data-icon]{display:grid}.quality-key #qualityValue{font:550 .64rem/1 var(--mono)}
+.picture-menu{position:absolute;z-index:9;top:calc(100% + 5px);right:0;width:12.1rem;max-height:min(18rem,65cqh);overflow:auto;overscroll-behavior:contain;pointer-events:auto;text-align:left;background:#1a2a21;color:#f6f0dc;border:1px solid #9b926d;border-radius:5px;box-shadow:0 5px 16px #07110db3;padding:4px}.picture-menu[hidden]{display:none!important}.picture-menu header{padding:5px 7px 8px;border-bottom:1px solid #ac9d724a;margin-bottom:3px}.picture-menu header strong,.picture-menu header small{display:block}.picture-menu header strong{font:600 .99rem/1.15 Georgia,serif}.picture-menu header small{font:500 .64rem/1.5 var(--mono);color:#ccceb9}.picture-menu button{display:flex;width:100%;align-items:center;justify-content:space-between;min-height:31px;border:0;border-radius:3px;padding:4px 8px;background:transparent;color:inherit;text-align:left;font:550 .85rem/1 var(--sans)}.picture-menu button:is(:hover,:focus-visible){background:#334d3b}.picture-menu [aria-checked=true]{color:#f4da9b}.picture-menu [aria-checked=true] i:after{content:'✓'}#viewWindow .feed-top:has(.picture-menu:not([hidden])){z-index:25}#cabinet .race-bug{max-width:calc(100cqw - 206px)}
+@media(max-width:760px),(pointer:coarse){.quality-key #qualityValue{display:none}#cabinet .quality-key{width:44px;height:44px}.picture-menu button{min-height:44px}}
+#cabinet .feed-top{align-items:center}
+
+/* Matching instrument keys. Preserve the conditional visibility of sound and menu. */
+#cabinet .feed-top{--square:42px;gap:4px}#cabinet .feed-top .glass-square,#cabinet.station-full .feed-top #fullButton{width:var(--square);min-width:var(--square);height:var(--square);min-height:var(--square);box-sizing:border-box;flex:none;justify-content:center;align-content:center;align-items:center;justify-items:center;flex-direction:column;gap:2px;padding:0;border:1px solid #a99e799c;border-radius:4px;color:#f5edcf;background:#17241de3}
+#cabinet .feed-top .glass-square:after{font:600 8px/1 var(--sans);letter-spacing:.015em}#actionButton:after{content:'Action'}#qualityButton:after{content:'Quality'}#fullButton:after{content:'Full'}#consoleSound:after{content:'Sound'}#floorMenuButton:after{content:'Menu'}#cabinet .quality-key #qualityValue{display:none}#cabinet .feed-top .glass-square[aria-expanded=true]{background:#394636;border-color:#e4c680;color:#ffe4aa}
+#cabinet .picture-menu{max-width:min(62cqw,calc(100vw - 12px));padding:4px}#cabinet .picture-menu button{height:36px;min-height:36px;box-sizing:border-box}#cabinet .race-bug{max-width:calc(100cqw - 218px)}
+.quality-switches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.quality-switches label{height:100%;align-content:end}.quality-switches select{height:38px;min-height:38px}
+@media(max-width:760px),(pointer:coarse){#cabinet .feed-top{--square:44px;gap:2px}#cabinet .picture-menu button,.quality-switches select{height:44px;min-height:44px}}
+@container(max-width:540px){#cabinet .feed-top .feed-ident{display:none}#cabinet:is(.console-stage,.finish-stage) .camera-button #cameraName{position:absolute;width:1px;height:1px;clip-path:inset(50%);overflow:hidden}#cabinet:is(.console-stage,.finish-stage) .camera-button:after{content:'View'}#cabinet:is(.console-stage,.finish-stage) .camera-button{min-width:44px}}
+
+.finish-field{display:flex;flex-direction:column}.finish-list{flex:1;min-height:0;height:auto}.finish-columns{flex:none;display:grid;grid-template-columns:3.1em minmax(0,1fr) auto;align-items:center;column-gap:clamp(5px,1.5cqw,16px);padding:5px clamp(5px,2cqw,20px);color:#d1cda8}.finish-columns span{font:550 .63rem/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase}.finish-columns span:last-child{text-align:right}@container finishers (max-height:245px){.finish-columns{display:none}}
+@container finishers (max-width:420px){.finish-row{grid-template-columns:2.15em 1.5em minmax(0,1fr) auto;font-size:clamp(13px,.85rem,16px);gap:4px;padding-inline:5px}.finish-row .place{font-size:1em}.finish-columns{grid-template-columns:2.15em minmax(0,1fr) auto;gap:4px;padding-inline:5px}.finish-row time{font-size:.79em}}
+@container finishers (max-height:180px){.finish-row{font-size:clamp(12px,.73rem,14px)}.finish-row b{line-height:1.2}}
+
+@media(max-width:355px){#cabinet:is(.console-stage,.finish-stage) .camera-button>span:last-child{display:none}}
+
+.tote-text{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+/* Sulky meeting · one official register paired with the customer's cash slip. */
+#finishSlate #officialGrid[data-paired=true]{grid-template-columns:minmax(0,1.65fr) minmax(0,.95fr);gap:clamp(6px,1vw,14px);grid-template-rows:minmax(0,1fr)}
+#finishSlate #officialGrid[data-paired=false]{grid-template-columns:minmax(0,1fr)}
+#finishSlate #officialGrid[data-paired=true][data-stacked=true]{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1.65fr) minmax(78px,.86fr);gap:6px}
+/* One register stock for both official placings and paid tickets. */
+.finish-list,#finishMyBets{--register-ground:#1a3028;--register-rule:#6673636b;--register-mark:#c7a366;--register-time:#e3d4ad;background:var(--register-ground);color:#f5f0df;border-top:2px solid var(--register-mark)}
+#finishMyBets{min-width:0;min-height:0;display:flex;flex-direction:column;overflow:auto;container:ticket-register / inline-size;scrollbar-width:thin}#finishMyBets[hidden]{display:none}
+.ticket-register-head,.ticket-register-summary,.ticket-register-row{padding-inline:clamp(6px,3cqw,14px);min-width:0}.ticket-register-head{display:flex;align-items:baseline;gap:.55em;padding-block:7px 5px;border-bottom:1px solid var(--register-rule)}.ticket-register-head h3{margin:0;color:#f5f0df;font:600 clamp(15px,5.5cqw,21px)/1.1 var(--sans)}.ticket-register-head span,.ticket-register-summary{font:550 clamp(10px,3cqw,12px)/1.2 var(--mono);color:#c9d5c8}.ticket-register-head b{margin-left:auto;white-space:nowrap;font:600 clamp(11px,3.7cqw,15px)/1.1 var(--mono);color:var(--register-time)}
+.ticket-register-summary{display:flex;gap:12px;flex-wrap:wrap;padding-block:5px;border-bottom:1px solid var(--register-rule)}.ticket-register-summary b,.ticket-figures b{font-variant-numeric:tabular-nums;color:var(--register-time)}.bets-settled{flex:1;min-height:28px;margin:0;padding:0;list-style:none;overflow-y:auto;scrollbar-width:thin}.ticket-register-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-content:center;gap:4px 6px;padding-block:7px;border-bottom:1px solid var(--register-rule);font:600 clamp(12px,4.3cqw,17px)/1.15 var(--sans)}.ticket-register-row[data-ticket-outcome=won]{background:#344337;box-shadow:inset 3px 0 #d9b472}.ticket-id{grid-column:1/-1;display:flex;align-items:baseline;justify-content:space-between}.ticket-id span,.ticket-id strong{font:550 clamp(9px,3cqw,11px)/1.2 var(--mono);letter-spacing:.07em;text-transform:uppercase;color:#c9d5c8}.ticket-id strong{color:#dfc2a5}.ticket-register-row[data-ticket-outcome=won] strong{color:#e5d8a0}.register-picks{display:grid;align-content:center;gap:3px;min-width:0}.register-picks .receipt-leg{display:grid;grid-template-columns:1.5em minmax(0,1fr);align-items:center;gap:.45em;overflow-wrap:anywhere;font-weight:600}.register-picks .receipt-plus{display:none}.register-picks .cloth{display:grid;place-items:center;box-sizing:border-box;width:1.5em;height:1.5em;border:1px solid #bcba9d80;font:650 .85em/1 var(--mono);border-radius:2px}.ticket-figures{display:grid;gap:2px;text-align:right;align-content:center;font:550 clamp(10px,3cqw,13px)/1.12 var(--mono);color:#c9d5c8}.bets-none{margin:9px 10px;color:#c9d5c8;font:500 12px/1.3 var(--sans)}
+@container ticket-register (max-width:213px){.ticket-register-head{flex-wrap:wrap;gap:.25em}.ticket-register-head span{display:none}.ticket-register-row{grid-template-columns:minmax(0,1fr)}.ticket-figures{display:flex;flex-wrap:wrap;gap:3px 7px;justify-content:space-between;text-align:left}.ticket-register-summary{gap:3px 8px}.ticket-register-head,.ticket-register-summary,.ticket-register-row{padding-inline:6px}}
+.finish-field .finish-columns,.finish-field .finish-row{grid-template-columns:2.3em 1.55em minmax(0,1.25fr) minmax(0,.92fr) minmax(3.8em,.61fr) 4.4em;column-gap:clamp(3px,.8cqw,10px);padding-inline:clamp(4px,1.25cqw,12px)}.finish-columns span:nth-child(2){grid-column:2/span 2}.finish-columns span:nth-last-child(-n+2){text-align:right}.finish-field .finish-row{font-size:clamp(13px,2.55cqw,18px)}.finish-row .f-style{font:500 .78em/1.12 var(--sans);color:#c9d5c8}.finish-row .f-chance{color:#dcc591;text-align:right;font:550 .78em/1 var(--mono);white-space:nowrap}.finish-row time{text-align:right}.finish-field .finish-columns span{font-size:clamp(8px,1.55cqw,11px)}
+@container finishers (max-width:490px){.finish-field .finish-row{grid-template-columns:2.05em 1.38em minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:5px;row-gap:1px;align-content:center}.finish-row .place,.finish-row .cloth{grid-row:1/span 2}.finish-row .f-name{grid-area:1/3}.finish-row .f-style{grid-area:2/3}.finish-row time{grid-area:1/4}.finish-row .f-chance{grid-area:2/4;font:500 .73em/1.1 var(--sans)}.f-chance:before{content:'Win ';color:#a8bbac}.finish-field .finish-columns{display:none}}
+@container finishers (max-height:200px){.finish-field .finish-row{font-size:12px}.finish-row .f-style,.finish-row .f-chance{font-size:10px}.finish-row .f-name{line-height:1.06}}
+#officialGrid[data-stacked=true] .ticket-register-head,#officialGrid[data-stacked=true] .ticket-register-summary,#officialGrid[data-stacked=true] .ticket-register-row{padding-block:3px}#officialGrid[data-stacked=true] .ticket-register-row{gap:2px 5px}
+@container finishers (min-width:491px){.finish-field .finish-columns,.finish-field .finish-row{font-size:clamp(13px,2.55cqw,18px);grid-template-columns:minmax(41px,2.65em) 1.55em minmax(0,1.25fr) minmax(0,.92fr) minmax(3.8em,.61fr) 4.4em}}
+@container finishers (max-width:490px) and (min-height:234px){.finish-field .finish-row{font-size:clamp(14px,4cqw,17px)}}
+
+/* Line the two gold ledger rules up; each paid ticket uses the same left
+   call / numbered runner / right-aligned figure order as a finish row. */
+#finishMyBets{border-top:0}.ticket-register-head{min-height:23px;box-sizing:border-box;padding-block:3px;border:0}.ticket-register-head h3{font-size:clamp(13px,4.7cqw,17px);line-height:1.1}.ticket-register-summary{border-top:2px solid var(--register-mark);padding-block:4px}
+@container ticket-register (min-width:214px){.ticket-register-row{grid-template-columns:minmax(35px,.48fr) minmax(0,1.42fr) minmax(61px,.8fr);align-items:center;column-gap:clamp(4px,1.5cqw,10px)}.ticket-id{grid-column:auto;display:grid;gap:4px;align-content:center}.ticket-id span{font:italic 600 clamp(12px,4.2cqw,17px)/1 Georgia,serif;text-transform:none;letter-spacing:0;color:#dad8b9}.ticket-id strong{font-size:9px}.ticket-figures{line-height:1.06}}
+#officialGrid[data-stacked=true] .ticket-register-head{min-height:0;padding-block:2px}#officialGrid[data-stacked=true] .ticket-register-summary{padding-block:2px}
+/* On a very shallow Rail, remove only the redundant LIVE TABLE ident. Keep
+   the menu, camera key, pin, monitor text and the fixed close-up lens intact. */
+@media(orientation:landscape) and (max-width:760px) and (max-height:360px){#cabinet[data-phase=race] #viewWindow.has-live-panel .feed-ident{display:none}}
+@media(orientation:landscape) and (max-width:760px) and (max-height:360px){
+ #cabinet[data-phase=race] #viewWindow:has(>#livePanel:not([hidden])) #raceBug{inset:auto auto 6px 6px;min-width:0;width:calc(100cqw - var(--live-width,80cqw) - 19px);max-width:125px;box-sizing:border-box;padding:3px 5px}
+ #viewWindow:has(>#livePanel:not([hidden])) .race-bug-head>#bugLens{display:none}#viewWindow:has(>#livePanel:not([hidden])) .race-bug-head>#bugLap{margin-left:0}#viewWindow:has(>#livePanel:not([hidden])) .race-bug-data{flex-wrap:wrap;gap:2px 4px}
+}
+
+/* A shallow glass can open its camera menu DOWN as well as up. Preserve
+   full-size keys, constrain it to the view and allow scrolling if necessary. */
+#cabinet #viewWindow>#cameraMenu{position:absolute;display:grid;bottom:auto;right:auto;z-index:24;margin:0;box-sizing:border-box;overflow-y:auto;overscroll-behavior:contain;background:#1c2b22;border:1px solid #b5a073;box-shadow:0 7px 22px #050e0ae0;padding:4px;gap:2px}
+#cabinet #viewWindow>#cameraMenu[hidden]{display:none}#viewWindow>#cameraMenu>.pop-label{grid-column:1/-1;padding:4px 7px}#cabinet #viewWindow>#cameraMenu button{min-height:44px;line-height:1.13;gap:4px;font-size:max(11px,.72rem);padding:3px 5px}#viewWindow>#cameraMenu i{font-size:9px}
+@container(max-height:220px){#viewWindow>#cameraMenu>.pop-label,#viewWindow>#cameraMenu button i{display:none}}
+@media(max-width:400px) and (max-height:610px){#cabinet.docked-rail[data-phase=race] #raceBug{inset:auto 5px 4px auto;display:flex;align-items:center;gap:4px;box-sizing:border-box;max-width:calc(100% - 73px);width:max-content;min-width:0;height:25px;padding:2px 5px;overflow:hidden}#cabinet.docked-rail #raceBug[hidden]{display:none}#cabinet.docked-rail #bugLens{display:none}#cabinet.docked-rail :is(.race-bug-data,.race-bug-head){display:flex;align-items:center;flex-wrap:nowrap;margin:0;white-space:nowrap;gap:3px}}
+
+#cabinet.track-shelf>.race-strip{display:flex;align-items:center;height:48px;min-height:48px;max-height:48px;gap:6px;box-sizing:border-box;padding:1px 5px;overflow:visible;z-index:14;position:relative}
+#cabinet.track-shelf>.race-strip :is(.strip-sub,.flag-icon,.strip-spacer,.phase-pill,.lap-readout,#wireReport small){display:none}#cabinet.track-shelf .race-wire{min-width:0;flex:1}#cabinet.track-shelf #wireReport{width:100%;padding:2px 0;text-align:left}#cabinet.track-shelf #wireCall{white-space:nowrap;text-overflow:ellipsis;overflow:hidden;display:block;font-size:11px}#cabinet.track-shelf .race-timer{flex:none;margin:0;line-height:1}#cabinet.track-shelf .race-ident{min-width:0;flex:none}#cabinet.track-shelf .race-ident .strip-title{font-size:11px}#cabinet.track-shelf .race-timer b{font-size:15px}#cabinet.track-shelf .race-timer span{font-size:8px}
+#cabinet #shortServices{position:static;display:flex;flex:none;gap:2px;width:auto;height:44px;align-items:center;pointer-events:auto;margin-left:auto}#shortServices .camera-button,#cabinet #shortServices #floorMenuButton{display:grid!important;place-items:center;width:44px;height:44px;min-width:44px;min-height:44px;padding:2px;margin:0}#shortServices .camera-button #cameraName,#shortServices .camera-button>span:last-child{display:none}#shortServices .camera-button:after{content:'View';font-size:8px}#cabinet #shortServices .picture-menu{top:auto;bottom:calc(100% + 4px);max-height:calc(100dvh - 56px)}#viewWindow.instrument-shelf .feed-format{display:none}
+@media(max-width:400px) and (max-height:610px){#cabinet.docked-rail[data-phase=race] .feed-bottom #cameraButton{width:44px;min-width:44px;padding:3px;justify-content:center}#cabinet.docked-rail[data-phase=race] #cameraButton :is(#cameraName,span:last-child),#cabinet.docked-rail[data-phase=race] .feed-format{display:none}#cabinet.docked-rail[data-phase=race] #cameraButton:after{content:none}}
+/* Fixed timing ribbon in the tiny dock: its appearance at the first split
+   must not change the aperture or magnification. */
+#cabinet.track-shelf.docked-rail #raceBug:not([hidden]){inset:3px auto auto 4px;height:25px;min-height:0;width:max-content;min-width:0;max-width:95%;box-sizing:border-box;display:flex;align-items:center;gap:6px;padding:2px 5px;white-space:nowrap}#cabinet.track-shelf.docked-rail #raceBug :is(.race-bug-head,.race-bug-data){display:flex;align-items:center;gap:4px;flex-wrap:nowrap;margin:0}#cabinet.track-shelf.docked-rail #raceBug #bugLens{display:none}
+/* Keep both locked market quotes visible in the official finish order. */
+.finish-field .finish-columns,.finish-field .finish-row{grid-template-columns:2.3em 1.55em minmax(0,1.25fr) minmax(0,.88fr) minmax(3.8em,.6fr) minmax(5.6em,.78fr) 4.4em}
+.finish-row .f-odds{display:flex;flex-direction:column;align-items:flex-end;gap:1px;color:#ecd5a7;font:550 .68em/1 var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}.finish-row .f-odds b{font-weight:550}
+@container finishers (max-width:490px){.finish-field .finish-row{grid-template-columns:2.05em 1.38em minmax(0,1fr) auto;grid-template-rows:auto auto auto}.finish-row .place,.finish-row .cloth{grid-row:1/span 3}.finish-row .f-name{grid-area:1/3}.finish-row .f-style{grid-area:2/3}.finish-row time{grid-area:1/4}.finish-row .f-chance{grid-area:2/4}.finish-row .f-odds{grid-area:3/3/4/5;flex-direction:row;gap:7px;justify-self:end;font-size:.62em}}
+@container finishers (max-height:200px){.finish-field .finish-row{padding-block:2px}.finish-row .f-odds{flex-direction:row;gap:4px;font-size:9px}}
