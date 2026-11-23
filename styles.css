@@ -344,6 +344,23 @@ html[data-device="desktop"] .wrap{width:min(1512px,calc(100% - clamp(48px,7.6vw,
 html[data-device="desktop"] .machine-layout{display:grid;grid-template-columns:minmax(0,1fr) clamp(310px,26.2vw,393px);gap:18px;align-items:stretch}
 html[data-device="desktop"] .runner-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
 
+/* Sound mix menu & folio controls */
+.sound-wrap,.console-sound-wrap{position:relative;display:flex;align-items:center;gap:2px;pointer-events:auto}
+.sound-menu-btn{display:grid;place-items:center;width:24px;height:28px;border:1px solid #354135;border-radius:4px;background:#151d17;color:#aeb7a7}
+.sound-menu-btn:hover,.sound-menu-btn[aria-expanded=true]{border-color:var(--gold);color:var(--gold-hi)}
+.sound-menu-btn .icon{width:12px;height:12px}
+.console-sound-wrap .console-sound-menu-btn{width:22px;height:30px;background:#151a14bb;border-color:#f4efe22e;color:#eceee2}
+.console-sound-wrap .console-sound-menu-btn:hover,.console-sound-wrap .console-sound-menu-btn[aria-expanded=true]{background:#182119f0;border-color:#dec3968a}
+@media(max-width:620px),(pointer:coarse){.console-sound-wrap .console-sound-menu-btn{width:28px;height:44px}}
+.sound-menu{z-index:35;width:13.2rem}
+.sound-menu button i{font-style:normal;font-size:12px;color:#f4da9b;min-width:14px;text-align:right}
+.audio-mix-card{border-color:#53664c;background:#19251b}
+.audio-mix-toggles{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.audio-mix-toggles button{flex:1 1 auto;min-height:36px;padding:6px 10px;border:1px solid #4d5d46;border-radius:5px;background:#1f2c21;color:#dce4d2;font:550 12px/1.2 var(--sans)}
+.audio-mix-toggles button:hover{border-color:var(--gold)}
+.audio-mix-toggles button[aria-pressed=true]{background:#3a3f28;border-color:#d5b77c;color:#f4da9b}
+
+
 
 
 

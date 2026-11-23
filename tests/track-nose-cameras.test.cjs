@@ -58,9 +58,9 @@ test('scene.js, round-program.js, and app.js route cameras 7 and 8 cleanly and p
 
   const appSrc = read('js/app.js');
   assert.ok(appSrc.includes("'Track overview','Horse nose cam'"));
-  assert.ok(appSrc.includes("/^[0-8]$/"));
+  assert.ok(appSrc.includes("/^[1234678]$/"));
   assert.ok(appSrc.includes("function noseUI()"));
-  assert.ok(appSrc.includes("(scene.camera+1)%camNames.length"));
+  assert.ok(appSrc.includes("activeCameras[(idx+1)%activeCameras.length]"));
   assert.ok(appSrc.includes("function startPhotoReplay()"));
   assert.ok(appSrc.includes("function stepNose(dir)"));
   assert.ok(appSrc.includes("function updatePip()"));
@@ -168,3 +168,46 @@ test('race monitor shows FIT left of STA and all cameras (0-8) have smooth dampi
   const consoleCss = read('assets/console.css');
   assert.ok(consoleCss.includes('#cabinet.console-stage.station-full .sat-case'), 'console.css expands console case in fullscreen');
 });
+
+test('audio channel mix (mute horses / commentary / all), camera removals (0 & 5), console Ready removal, and 3D WebGL enhancements', () => {
+  const html = read('index.html');
+  assert.ok(html.includes('id="soundMenu"') && html.includes('data-audio-toggle="horses"') && html.includes('data-audio-toggle="commentary"') && html.includes('data-audio-toggle="all"'), 'sound mix popover has mute horses/commentary/all');
+  assert.ok(html.includes('id="soundMenuButton"') && html.includes('id="consoleSoundMenuButton"'), 'sound mix menu buttons present in header and feed-top');
+  assert.ok(html.includes('id="deskMuteHorses"') && html.includes('id="deskMuteCommentary"'), 'fullscreen desk menu includes mute horses and commentary toggles');
+
+  assert.ok(!html.includes('data-camera="0"') && !html.includes('data-camera="5"'), 'Long-side seat (0) and Satellite floor (5) removed from cameraMenu');
+  assert.ok(!html.includes('value="0"') && !html.includes('value="5"'), 'Long-side seat (0) and Satellite floor (5) removed from deskCamera');
+  assert.ok(!html.includes('id="seatLocator"'), 'seatLocator button removed from terminal');
+  assert.ok(!html.includes('data-tube="start"'), 'console Ready/start button removed from sat-deck');
+  assert.ok(html.includes('id="raceNow"') && html.includes('id="deskStartRace"'), 'raceNow and deskStartRace remain intact');
+
+  const audioSrc = read('js/audio.js');
+  assert.ok(audioSrc.includes('horsesBus') && audioSrc.includes('commentaryBus') && audioSrc.includes('fxBus'), 'audio.js separates horsesBus, commentaryBus and fxBus');
+  assert.ok(audioSrc.includes('setMuteHorses') && audioSrc.includes('setMuteCommentary') && audioSrc.includes('getChannels'), 'audio.js exports channel mute API');
+  assert.ok(audioSrc.includes('ascot-audio-channels-v1'), 'audio.js persists channel mute preferences');
+
+  const folioSrc = read('js/station-folios.js');
+  assert.ok(folioSrc.includes('audioMixCard') && folioSrc.includes('data-folio-audio='), 'station-folios Sound tab renders interactive Audio mix card');
+
+  const appSrc = read('js/app.js');
+  assert.ok(appSrc.includes('activeCameras=[1,2,3,4,6,7,8]') && appSrc.includes('if(n===0||n===5)n=1;'), 'app.js restricts activeCameras and guards 0/5');
+  assert.ok(appSrc.includes('toggleAudioChannel') && appSrc.includes("addEventListener('ascot:audio-mix'"), 'app.js wires channel mute UI and syncs folio events');
+
+  const sceneSrc = read('js/scene.js');
+  assert.ok(sceneSrc.includes('if(v===0||v===5)v=1;'), 'scene.js guards lens(0/5) back to 1');
+
+  const deskSrc = read('js/fullscreen-desk.js');
+  assert.ok(deskSrc.includes('lastLook=1') && deskSrc.includes('if(n===0||n===5)n=1;'), 'fullscreen-desk defaults lastLook to 1 and guards 0/5');
+
+  const orbitSrc = read('js/orbit.js');
+  assert.ok(orbitSrc.includes('scene.add(sun.target)') && orbitSrc.includes('function updateShadowFrustum'), 'orbit.js dynamically aims and tightens directional shadow frustum');
+  assert.ok(orbitSrc.includes('Math.min(16,r.capabilities.getMaxAnisotropy())') && orbitSrc.includes('chart.generateMipmaps=true'), 'orbit.js enables 16x anisotropy and explicit mipmaps');
+  assert.ok(orbitSrc.includes('overviewBrass') && orbitSrc.includes('envMapIntensity'), 'orbit.js adds overviewBrass bezel and material envMapIntensity');
+
+  const rigSrc = read('js/horse-rig.js');
+  assert.ok(rigSrc.includes('sheen:.35') && rigSrc.includes('sheenColor') && rigSrc.includes('clearcoat:.26'), 'horse-rig.js upgrades equine coat with physical sheen and clearcoat');
+
+  const sulkySrc = read('js/sulky.js');
+  assert.ok(sulkySrc.includes('MeshPhysicalMaterial') && sulkySrc.includes('clearcoat:.85'), 'sulky.js upgrades wheel covers to MeshPhysicalMaterial clearcoat');
+});
+
