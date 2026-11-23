@@ -103,6 +103,9 @@ test('track overview is tilted lower, foldable players menu sits bottom-left, an
   assert.ok(mpSrc.includes("includes('application/json')"), 'guards against SPA HTML fallback on /api/info');
   assert.ok(mpSrc.includes('name="pin"'), 'login gate supports personal PIN');
   assert.ok(mpSrc.includes('playersPinnedOpen') && mpSrc.includes('syncPlayersMenuOpen'), 'keeps active players menu open by default');
+  assert.ok(mpSrc.includes('playerBetsTip') && mpSrc.includes('mouseover'), 'shows hovered player bets on mouseover');
+  const receiptSrc = read('js/race-receipt.js');
+  assert.ok(receiptSrc.includes('players-results') && receiptSrc.includes('playerResults'), 'renders other players results in result panel');
 
   const appSrc = read('js/app.js');
   assert.ok(appSrc.includes('window.AscotMultiplayer?AscotMultiplayer.attach'), 'guards against missing multiplayer script');

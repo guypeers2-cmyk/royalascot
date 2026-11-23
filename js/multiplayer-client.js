@@ -58,7 +58,7 @@
    function updateLocalPlayersList(){
      if(enabled)return;
      const s=game.state;
-     onlineNames=localUser?[{id:localUser.id,name:localUser.name,balance:Math.round((Number(s.balance)||0)*100)/100,online:true}]:[];
+     onlineNames=localUser?[{id:localUser.id,name:localUser.name,balance:Math.round((Number(s.balance)||0)*100)/100,online:true,bets:JSON.parse(JSON.stringify(s.bets||[]))}]:[];
      setStatus(false);
    }
 
@@ -86,6 +86,33 @@
      btn.setAttribute('aria-expanded',String(playersPinnedOpen));
    }
 
+   let hoveredPlayerId='';
+   function renderHoveredBets(){
+     const menu=$('playersMenu'),list=$('playersList');
+     if(!menu||!list)return;
+     let tip=$('playerBetsTip');
+     if(!tip){
+       tip=document.createElement('div');
+       tip.id='playerBetsTip';
+       tip.className='player-bets-tip';
+       tip.hidden=true;
+       list.after(tip);
+     }
+     if(!hoveredPlayerId){tip.hidden=true;tip.innerHTML='';return;}
+     const player=onlineNames.find(x=>x&&x.online!==false&&x.id===hoveredPlayerId);
+     if(!player){hoveredPlayerId='';tip.hidden=true;tip.innerHTML='';return;}
+     const bets=Array.isArray(player.bets)?player.bets:[];
+     const runners=game.state?.runners||[];
+     const mName={win:'Win',show:'Show',quinella:'Quinella'};
+     const items=bets.map(b=>{
+       const picks=(b.nums||[]).map(n=>{const r=runners[n-1];return r?`#${n} ${esc(r.name)}`:`#${n}`;}).join(' + ');
+       const odds=Number.isFinite(b.odds)?` @ ${Number(b.odds).toFixed(1)}×`:'';
+       return `<li><b>${esc(mName[b.market]||b.market)}</b><span>${picks}</span><em>${Math.round(b.stake)}m${odds}</em></li>`;
+     }).join('');
+     tip.innerHTML=`<header><strong>${esc(player.name)} · Bets</strong><span>${bets.length}</span></header>${bets.length?`<ul>${items}</ul>`:'<p>No open bets on this race</p>'}`;
+     tip.hidden=false;
+   }
+
    function setStatus(offline=false){
      updatePlayerBadge();
      const wrap=$('playersWrap'),btn=$('playersButton'),cnt=$('playersCount'),list=$('playersList'),codeEl=$('playersTableCode'),copy=$('playersCopyCode');
@@ -96,21 +123,23 @@
      btn.dataset.offline=String(offline);
      if(copy)copy.hidden=!enabled;
      const isSignedIn=enabled?joined:!!localUser;
-     if(!isSignedIn){if(cnt)cnt.textContent='Login';if(list)list.innerHTML='';syncPlayersMenuOpen();return;}
+     if(!isSignedIn){if(cnt)cnt.textContent='Login';if(list)list.innerHTML='';hoveredPlayerId='';renderHoveredBets();syncPlayersMenuOpen();return;}
      const activePlayers=onlineNames.filter(x=>x&&x.online!==false);
      const n=activePlayers.length;
      if(cnt)cnt.textContent=enabled?`${n} active`:'Local only';
      if(codeEl)codeEl.textContent=enabled?(tableCode||''):'OFFLINE · NO SERVER';
-     btn.title=enabled?`Active players (${n}). Click to view or switch player.`:'Offline single-device mode (no shared multiplayer server detected).';
+     btn.title=enabled?`Active players (${n}). Hover a player to view bets.`:'Offline single-device mode (no shared multiplayer server detected).';
      btn.setAttribute('aria-label',btn.title);
      if(list){
        const meId=profile?.id||localUser?.id;
        const rows=activePlayers.map(x=>{
          const me=meId&&x.id===meId;
          const bal=Number.isFinite(x.balance)?`${Math.round(x.balance)}m`:'';
-         return `<li class="${me?'is-me':''}"><i class="players-dot" aria-hidden="true"></i><span class="p-name">${esc(x.name)}${me?' (you)':''}</span><span class="p-medals">${esc(bal)}</span></li>`;
+         const betCount=Array.isArray(x.bets)?x.bets.length:0;
+         return `<li class="${me?'is-me':''}${hoveredPlayerId===x.id?' is-hover':''}" data-player-id="${esc(x.id)}" tabindex="0" title="Hover to view ${esc(x.name)}'s bets"><i class="players-dot" aria-hidden="true"></i><span class="p-name">${esc(x.name)}${me?' (you)':''}</span><span class="p-medals">${betCount?`${betCount}b · `:''}${esc(bal)}</span></li>`;
        }).join('')||'<li><span class="p-name">No active players</span></li>';
        list.innerHTML=enabled?rows:`${rows}<li class="players-offline-note"><span class="p-name">Single-device only — deploy Worker/server to share a table</span></li>`;
+       renderHoveredBets();
      }
      syncPlayersMenuOpen();
    }
@@ -156,6 +185,34 @@
        try{await navigator.clipboard.writeText(tableCode);copy.textContent='Copied!';setTimeout(()=>{copy.textContent='Copy code';},1400);}catch{notify('Table join code: '+tableCode);}
      });
      sw?.addEventListener('click',()=>switchPlayerPrompt('Log in with your username & 4-digit PIN to load your medals.'));
+     const list=$('playersList');
+     if(list&&!list.dataset.hoverBound){
+       list.dataset.hoverBound='1';
+       const pick=e=>{
+         const li=e.target.closest('li[data-player-id]');
+         const id=li?.dataset?.playerId||'';
+         if(id&&id!==hoveredPlayerId){
+           hoveredPlayerId=id;
+           list.querySelectorAll('li[data-player-id]').forEach(el=>el.classList.toggle('is-hover',el.dataset.playerId===id));
+           renderHoveredBets();
+         }
+       };
+       list.addEventListener('mouseover',pick);
+       list.addEventListener('focusin',pick);
+       list.addEventListener('mouseleave',()=>{
+         if(!hoveredPlayerId)return;
+         hoveredPlayerId='';
+         list.querySelectorAll('li.is-hover').forEach(el=>el.classList.remove('is-hover'));
+         renderHoveredBets();
+       });
+       list.addEventListener('focusout',e=>{
+         if(!list.contains(e.relatedTarget)){
+           hoveredPlayerId='';
+           list.querySelectorAll('li.is-hover').forEach(el=>el.classList.remove('is-hover'));
+           renderHoveredBets();
+         }
+       });
+     }
    }
 
    function syncPinDots(input){
