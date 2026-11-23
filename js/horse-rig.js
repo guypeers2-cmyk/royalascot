@@ -1,14 +1,15 @@
 /* The same free-standing unmounted trotter and sulky for the orbit and all studio passes. */
 (function(){'use strict';const TAU=Math.PI*2;let data;
-window.CabinetFigurines=function(arena){const T=THREE,D=data||(data=CarrierMeshData()),loader=new T.TextureLoader();const palette=new Array(64);let gait=null;return function(n){
+const sharedPalettes={walk:new Array(64),trot:new Array(64)};
+window.CabinetFigurines=function(arena){const T=THREE,D=data||(data=CarrierMeshData()),loader=new T.TextureLoader();let warmSolver=null;const make=function(n){
  const h=new T.Group();arena.add(h);const g=new T.BufferGeometry(),p=new Float32Array(D.pos),smooth=(lo,hi,x)=>{const v=Math.max(0,Math.min(1,(x-lo)/(hi-lo)));return v*v*(3-2*v);};
  // Preserve the photographic contour but give the lit barrel, withers and
  // neck more curvature when the model rotates away from a broadside view.
  for(let i=0;i<p.length;i+=3)p[i+2]*=1+.24*smooth(.19,.30,p[i+1])*(1-.6*smooth(.43,.56,p[i+1]));
  const rest=p.slice();g.setAttribute('position',new T.BufferAttribute(p,3));g.setAttribute('uv',new T.BufferAttribute(D.uv,2));g.setIndex(new T.BufferAttribute(D.idx,1));g.computeVertexNormals();const normals=g.attributes.normal.array,restN=normals.slice();g.attributes.position.setUsage(T.DynamicDrawUsage);g.attributes.normal.setUsage(T.DynamicDrawUsage);
- const file='cast-'+n+'.webp',tex=loader.load(window.ASCOT_ASSETS?.[file]||'assets/'+file);tex.colorSpace=T.SRGBColorSpace;tex.anisotropy=16;
+ const file='cast-'+n+'.webp',tex=loader.load(window.ASCOT_ASSETS?.[file]||'assets/'+file);tex.colorSpace=T.SRGBColorSpace;tex.anisotropy=8;
  const skin=new T.MeshPhysicalMaterial({map:tex,roughness:.56,metalness:.008,clearcoat:.26,clearcoatRoughness:.32,sheen:.35,sheenRoughness:.55,sheenColor:new T.Color('#ffe8c4'),envMapIntensity:.75,emissiveMap:tex,emissive:0xffffff,emissiveIntensity:.065,side:T.DoubleSide});const body=new T.Mesh(g,skin);body.castShadow=true;h.add(body);
- if(window.AscotCloth){const print=new T.CanvasTexture(AscotCloth.stamp(n));print.colorSpace=T.SRGBColorSpace;print.anisotropy=16;const dye=new T.MeshStandardMaterial({map:print,transparent:true,alphaTest:.38,roughness:.88,envMapIntensity:.35,polygonOffset:true,polygonOffsetFactor:-1});for(const side of [1,-1]){const patch=new T.Mesh(new T.PlaneGeometry(.145,.127),dye);patch.position.set(-.051,.354,side*.104);patch.rotation.order='YXZ';patch.rotation.y=side<0?Math.PI:0;patch.rotation.z=side*-.065;body.add(patch);}}
+ if(window.AscotCloth){const print=new T.CanvasTexture(AscotCloth.stamp(n));print.colorSpace=T.SRGBColorSpace;print.anisotropy=8;const dye=new T.MeshStandardMaterial({map:print,transparent:true,alphaTest:.38,roughness:.88,envMapIntensity:.35,polygonOffset:true,polygonOffsetFactor:-1});for(const side of [1,-1]){const patch=new T.Mesh(new T.PlaneGeometry(.145,.127),dye);patch.position.set(-.051,.354,side*.104);patch.rotation.order='YXZ';patch.rotation.y=side<0?Math.PI:0;patch.rotation.z=side*-.065;body.add(patch);}}
  // The Turf cast has no plinth or spindle beneath its feet. Ground it
  // on the lowest articulated hoof instead of drawing a shoe-shaped plinth.
  h.userData.cast='harness-trot';const bike=(window.AscotSulky||(typeof require==='function'?require('./sulky'):null)).create(T,h,body,n);
@@ -56,11 +57,15 @@ window.CabinetFigurines=function(arena){const T=THREE,D=data||(data=CarrierMeshD
  // is applied after interpolation; a race flight is never pinned to the turf. The exact solver
  // above remains authoritative for starting effort and photographic stock.
  const soles=[];for(let j=0;j<parts.length;j++)if(parts[j].leg&&parts[j].y<.16)soles.push(j*3);
- function cell(k,walk){if(palette[k])return palette[k];setPhase(k*TAU/64,1,walk,0);const v=new Int16Array(p.length*2);for(let j=0;j<p.length;j++){v[j]=Math.round(p[j]*32766);v[j+p.length]=Math.round(normals[j]*16000);}return palette[k]=v;}
- function move(theta,amp,walk,bank){if(amp!==1){setPhase(theta,amp,walk,bank);return;}if(gait!==walk){gait=walk;palette.fill(null);}const u=((theta/TAU)%1+1)%1*64,k=Math.floor(u),f=u-k,A=cell(k,walk),B=cell((k+1)%64,walk),N=p.length;
+ function cell(k,walk){const bank=walk?sharedPalettes.walk:sharedPalettes.trot;if(bank[k])return bank[k];setPhase(k*TAU/64,1,walk,0);const v=new Int16Array(p.length*2);for(let j=0;j<p.length;j++){v[j]=Math.round(p[j]*32766);v[j+p.length]=Math.round(normals[j]*16000);}return bank[k]=v;}
+ if(!warmSolver)warmSolver=(k,walk)=>cell(k,walk);
+ function move(theta,amp,walk,bank){if(amp!==1){setPhase(theta,amp,walk,bank);return;}const u=((theta/TAU)%1+1)%1*64,k=Math.floor(u),f=u-k,A=cell(k,walk),B=cell((k+1)%64,walk),N=p.length;
    const p0=(1-f)/32766,p1=f/32766,n0=(1-f)/16000,n1=f/16000;for(let j=0;j<N;j++){p[j]=p0*A[j]+p1*B[j];normals[j]=n0*A[N+j]+n1*B[N+j];}
    if(walk){const a=Math.sin(theta),rz=.010*Math.sin(theta*2+.32),rx=bank+.009*a,sy=Math.cos(rx)*Math.sin(rz),cy=Math.cos(rx)*Math.cos(rz),sz=-Math.sin(rx);let low=Infinity;for(const j of soles)low=Math.min(low,sy*p[j]+cy*p[j+1]+sz*p[j+2]);body.rotation.set(rx,0,rz);body.position.y=.0015-low;}
    else{trotBank(bank);body.rotation.set(bank,0,0);body.position.y=.0015-G.floor+G.trunk(theta/TAU);}bike.update(theta,amp,walk);g.attributes.position.needsUpdate=g.attributes.normal.needsUpdate=true;
  }
  return{mesh:h,texture:tex,balance:bike.balance,roll:bike.roll,setPhase,move,setPose:k=>setPhase(k/8*TAU),get ready(){return !!tex.image?.complete;}};
-};};})();
+};
+make.warm=()=>{if(!warmSolver)return;let idx=0;const step=()=>{const end=Math.min(128,idx+8);for(;idx<end;idx++)warmSolver(idx&63,idx>=64);if(idx<128)(typeof requestIdleCallback==='function'?requestIdleCallback:setTimeout)(step,16);};(typeof requestIdleCallback==='function'?requestIdleCallback:setTimeout)(step,40);};
+return make;
+};})();

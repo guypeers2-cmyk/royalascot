@@ -54,7 +54,7 @@
    if(ms<850||n<4)return false;const over=slow/n>=.68;ms=slow=n=0;return over;}};}
  // Only for Auto. Test the canvas that will actually be used; declining a
  // software renderer here does not disable a later, explicit Cabinet orbit.
- function acceleration(canvas){try{const attrs={alpha:false,antialias:true,preserveDrawingBuffer:true,powerPreference:'high-performance',failIfMajorPerformanceCaveat:true};const gl=canvas.getContext('webgl2',attrs)||canvas.getContext('webgl',attrs);if(!gl)return false;
+ function acceleration(canvas){try{const attrs={alpha:false,antialias:true,preserveDrawingBuffer:false,powerPreference:'high-performance',failIfMajorPerformanceCaveat:true};const gl=canvas.getContext('webgl2',attrs)||canvas.getContext('webgl',attrs);if(!gl)return false;
    const ext=gl.getExtension('WEBGL_debug_renderer_info'),name=ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER);return !/swiftshader|llvmpipe|softpipe|software|basic render driver|lavapipe/i.test(name||'');}catch{return false;}}
  // A projected horse footprint (or map disc), tested against actual glass.
  // Checking the closest point also rejects near misses in the ellipse corners.
