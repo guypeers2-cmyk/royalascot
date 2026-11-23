@@ -267,6 +267,8 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}.drawer-start{display:n
 .players-list li.is-hover,.players-list li[data-player-id]:hover{border-color:#e2c280;background:#253529}
 .players-list li .p-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .players-list li .p-medals{font:600 10.5px/1 var(--mono);color:#d7bc82}
+.players-list li .p-ready{font:700 9px/1 var(--mono);font-style:normal;letter-spacing:.05em;padding:2px 5px;border-radius:3px;background:#274e31;border:1px solid #6ec883;color:#c9f7d0;flex:none}
+.sat-deck .key-start.is-ready,.drawer-start.is-ready,.skip-race.is-ready{background:linear-gradient(#356c42,#254f30);border-color:#7bd88e;color:#e7ffea!important}
 .player-bets-tip{margin-top:7px;padding:7px 8px;border-radius:6px;background:#101914;border:1px solid #8a784d;color:#f3ebd3;font-size:11px;line-height:1.3}
 .player-bets-tip[hidden]{display:none}
 .player-bets-tip header{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:5px;padding-bottom:4px;border-bottom:1px solid #2e3b31;color:#e7cb8f;font:650 10.5px/1.2 var(--sans)}

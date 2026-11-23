@@ -113,8 +113,39 @@
      tip.hidden=false;
    }
 
+   function syncReadyButtons(){
+     if(typeof document==='undefined')return;
+     const activePlayers=onlineNames.filter(x=>x&&x.online!==false);
+     const total=activePlayers.length,readyCount=activePlayers.filter(x=>x.ready).length,myReady=Boolean(enabled&&profile?.ready);
+     const isBetting=game.state?.phase==='betting';
+     const countLabel=enabled&&total>0?` (${readyCount}/${total})`:'';
+     const tubeBtn=document.querySelector('[data-tube="start"]'),deskBtn=$('deskStartRace'),stripBtn=$('raceNow');
+     if(tubeBtn){
+       tubeBtn.innerHTML=myReady?`Ready ✓${countLabel}`:`Ready${countLabel} <span>▸</span>`;
+       tubeBtn.classList.toggle('is-ready',myReady&&isBetting);
+       tubeBtn.setAttribute('aria-pressed',String(myReady&&isBetting));
+       tubeBtn.title=enabled
+         ?(myReady?`You are ready (${readyCount}/${total}). Click to unready while waiting for other players.`:`Click Ready (${readyCount}/${total}). Race starts when all players are ready.`)
+         :'Mark ready to start the race countdown';
+     }
+     if(deskBtn){
+       deskBtn.innerHTML=myReady?`Ready ✓${countLabel}`:`Ready${countLabel} <span aria-hidden="true">▸</span>`;
+       deskBtn.classList.toggle('is-ready',myReady&&isBetting);
+       deskBtn.setAttribute('aria-pressed',String(myReady&&isBetting));
+     }
+     if(stripBtn){
+       stripBtn.classList.toggle('is-ready',myReady&&isBetting);
+       stripBtn.setAttribute('aria-pressed',String(myReady&&isBetting));
+       stripBtn.title=enabled
+         ?(myReady?`Ready (${readyCount}/${total}) — waiting for others`:`Ready (${readyCount}/${total}) — race starts when all players are ready`)
+         :'Ready to start the race countdown';
+       stripBtn.setAttribute('aria-label',stripBtn.title);
+     }
+   }
+
    function setStatus(offline=false){
      updatePlayerBadge();
+     syncReadyButtons();
      const wrap=$('playersWrap'),btn=$('playersButton'),cnt=$('playersCount'),list=$('playersList'),codeEl=$('playersTableCode'),copy=$('playersCopyCode');
      if(!wrap||!btn)return;
      const active=enabled||!!localUser;
@@ -136,7 +167,8 @@
          const me=meId&&x.id===meId;
          const bal=Number.isFinite(x.balance)?`${Math.round(x.balance)}m`:'';
          const betCount=Array.isArray(x.bets)?x.bets.length:0;
-         return `<li class="${me?'is-me':''}${hoveredPlayerId===x.id?' is-hover':''}" data-player-id="${esc(x.id)}" tabindex="0" title="Hover to view ${esc(x.name)}'s bets"><i class="players-dot" aria-hidden="true"></i><span class="p-name">${esc(x.name)}${me?' (you)':''}</span><span class="p-medals">${betCount?`${betCount}b · `:''}${esc(bal)}</span></li>`;
+         const readyBadge=x.ready?'<em class="p-ready">READY</em>':'';
+         return `<li class="${me?'is-me':''}${hoveredPlayerId===x.id?' is-hover':''}" data-player-id="${esc(x.id)}" tabindex="0" title="Hover to view ${esc(x.name)}'s bets"><i class="players-dot" aria-hidden="true"></i><span class="p-name">${esc(x.name)}${me?' (you)':''}</span>${readyBadge}<span class="p-medals">${betCount?`${betCount}b · `:''}${esc(bal)}</span></li>`;
        }).join('')||'<li><span class="p-name">No active players</span></li>';
        list.innerHTML=enabled?rows:`${rows}<li class="players-offline-note"><span class="p-name">Single-device only — deploy Worker/server to share a table</span></li>`;
        renderHoveredBets();
@@ -521,7 +553,7 @@
    game.tick=dt=>{if(!enabled){if(gate&&!gate.hidden)return;return original.tick(dt);}if(joined&&Date.now()-lastFresh<900&&Number.isFinite(dt)&&dt>0)game.state.clock+=Math.min(dt,.08);};
    game.place=(market,nums,amount)=>{if(!enabled){const res=original.place(market,nums,amount);if(!res)saveLocalProfile();return res;}command('place',{market,nums,amount});return null;};
    game.cancel=i=>{if(!enabled){const ok=original.cancel(i);if(ok)saveLocalProfile();return ok;}if(!joined)return false;command('cancel',{index:i});return true;};
-   game.close=(...args)=>enabled?command('close'):original.close(...args);
+   game.close=(...args)=>enabled?command('ready'):original.close(...args);
    game.next=(...args)=>enabled?command('next'):original.next(...args);
    game.refill=(...args)=>{if(enabled){command('refill');return true;}const ok=original.refill(...args);if(ok)saveLocalProfile();return ok;};
    game.save=(...args)=>{if(enabled)return undefined;saveLocalProfile();return original.save(...args);};
