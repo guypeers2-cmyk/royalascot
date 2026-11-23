@@ -5,7 +5,8 @@
    list=board.querySelector('ol'),legend=board.querySelector('.rail-legend'),lap=monitor.querySelector('.rail-lap'),count=el.querySelector('.track-count'),slipKey=el.querySelector('button'),boardKey=monitor.querySelector('button'),I=RunnerIntel;
  const drives={boxed:['Ready','Ready','Standing in the starting stall'],saving:['Saving','Save','Saving: cruising between sprints; reserve drains slowly.'],active:['Sprint','Sprint','Sprint: racing at sprint speed and using reserve faster.'],spent:['Spent','Spent','Spent: all scheduled sprints are over. This does not mean the tank is empty.'],finished:['Finished','Fin','Finished'],unknown:['—','—','Sprint not recorded']};
  const cab=$('cabinet'),dockKey=$('railDock'),stopKey=$('railStop'),bay=document.createElement('div');bay.id='railBay';bay.hidden=true;cab.insertBefore(bay,track.nextSibling);
- let docked=false;try{docked=localStorage.getItem('ascot-live-position')==='docked';}catch{}
+ const isCompact=()=>{const d=document.documentElement?.dataset?.device;return d==='mobile'||(d!=='desktop'&&window.innerWidth<=680);};
+ let docked=isCompact(),manualDock=false;try{const savedDock=localStorage.getItem('ascot-live-position');if(savedDock==='docked'||savedDock==='overlay'){docked=savedDock==='docked';manualDock=true;}}catch{}
  let race=-1,model=null,marketKey='',modelNo=-1,gateWins=null,rows=[],deskRows=[],readings=[],folded=false,boardFolded=false,pin=null,job=0,legKeys=[],deskLegs=[],slots=[];
  try{boardFolded=sessionStorage.getItem('ascot-rail-board')==='folded';}catch{}
  const text=(e,t)=>{if(e.textContent!==t)e.textContent=t;};
@@ -24,7 +25,8 @@
  function position(on){panel.removeAttribute('data-on-horse');const outside=on&&docked;bay.hidden=!outside;cab.classList.toggle('docked-rail',outside);const host=outside?bay:track;
    if(panel.parentElement!==host)host.append(panel);track.classList.toggle('has-live-panel',on&&!outside);dockKey.setAttribute('aria-pressed',String(outside));
    dockKey.querySelector('span').textContent=outside?'Overlay':'Dock';dockKey.title=dockKey.ariaLabel=outside?'Return panel to bottom right of track':'Dock panel outside track view';queue();}
- dockKey.onclick=()=>{docked=!docked;try{localStorage.setItem('ascot-live-position',docked?'docked':'overlay');}catch{}position(true);dockKey.focus({preventScroll:true});};
+ dockKey.onclick=()=>{docked=!docked;manualDock=true;try{localStorage.setItem('ascot-live-position',docked?'docked':'overlay');}catch{}position(true);dockKey.focus({preventScroll:true});};
+ window.addEventListener('resize',()=>{if(manualDock)return;const want=isCompact();if(want!==docked){docked=want;if(!panel.hidden)position(true);}});
  function queue(){if(!job)job=requestAnimationFrame(fit);}
  const ro=new ResizeObserver(queue);for(const e of [panel,bay,track,track.querySelector('.feed-top'),track.querySelector('.feed-bottom'),$('raceBug'),$('announcement')])ro.observe(e);document.fonts?.ready.then(queue);
  function show(){const size=game.state.bets.length;paper.hidden=!size||folded;slipKey.disabled=!size;slipKey.setAttribute('aria-expanded',String(!paper.hidden));

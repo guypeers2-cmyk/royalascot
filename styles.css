@@ -310,25 +310,39 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}.drawer-start{display:n
 @media(max-width:540px){.device-link{padding:5px 7px;font-size:9.5px}}
 
 /* Explicit user-chosen display mode: Mobile / Tablet / Desktop */
-html[data-device="mobile"] .wrap{width:min(440px,calc(100% - 20px))}
-html[data-device="mobile"] .topbar{gap:10px;height:58px}
-html[data-device="mobile"] .main-nav{gap:10px}
+html[data-device="mobile"] .wrap{width:min(440px,calc(100% - 14px))}
+html[data-device="mobile"] .topbar{gap:4px;height:46px}
+html[data-device="mobile"] .brand{gap:5px}
+html[data-device="mobile"] .brand .club-crest{width:24px}
+html[data-device="mobile"] .brand-type b{font-size:14px}
+html[data-device="mobile"] .main-nav{gap:2px;margin-left:auto}
+html[data-device="mobile"] .head-tools{gap:2px}
+html[data-device="mobile"] .tool-rule{display:none}
 html[data-device="mobile"] .nav-item span:last-child,html[data-device="mobile"] .guide-link span:last-child,html[data-device="mobile"] .sound-text{display:none}
-html[data-device="mobile"] .sound-button{min-width:0}
-html[data-device="mobile"] .intro{padding:16px 0 14px;gap:10px}
-html[data-device="mobile"] h1{font-size:34px}
-html[data-device="mobile"] .edition{display:none}
-html[data-device="mobile"] .machine-layout{display:flex;flex-direction:column;gap:13px}
-html[data-device="mobile"] .view-window{flex:none;min-height:0;aspect-ratio:1.62;width:100%}
-html[data-device="mobile"] .terminal{padding:14px 13px 0}
-html[data-device="mobile"] .market-pane{display:grid;grid-template-columns:1fr 1fr;column-gap:10px}
-html[data-device="mobile"] .market-tabs,html[data-device="mobile"] .price-line,html[data-device="mobile"] .place-button{grid-column:1/-1}
-html[data-device="mobile"] .runner-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-html[data-device="mobile"] .horse-card{padding:8px}
+html[data-device="mobile"] .topbar .nav-item,html[data-device="mobile"] .topbar .guide-link,html[data-device="mobile"] .topbar .sound-button{height:34px;min-width:34px;padding:0 7px;justify-content:center}
+html[data-device="mobile"] .topbar .sound-menu-btn{width:22px;height:34px}
+html[data-device="mobile"] .device-link{padding:4px 7px;font-size:9.5px}
+html[data-device="mobile"] .intro{padding:8px 0 9px;gap:6px}
+html[data-device="mobile"] .breadcrumb,html[data-device="mobile"] .edition{display:none}
+html[data-device="mobile"] h1{font-size:26px}
+html[data-device="mobile"] .balance{padding:3px 7px;gap:6px}
+html[data-device="mobile"] .balance small{font-size:9.5px}
+html[data-device="mobile"] .balance-total b{font-size:15px}
+html[data-device="mobile"] .machine-layout{display:flex;flex-direction:column;gap:10px}
+html[data-device="mobile"] .view-window{flex:none;min-height:220px;aspect-ratio:1.5;width:100%}
+html[data-device="mobile"] .terminal{padding:12px 11px 6px}
+html[data-device="mobile"] .market-pane{display:flex;flex-direction:column;gap:10px}
+html[data-device="mobile"] .stake-field{margin-top:0}
+html[data-device="mobile"] .market-tabs button,html[data-device="mobile"] .runner-choice,html[data-device="mobile"] .place-button,html[data-device="mobile"] .my-bets{min-height:38px;font-size:13px}
+html[data-device="mobile"] .runner-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+html[data-device="mobile"] .horse-card{padding:9px;gap:4px}
+html[data-device="mobile"] .horse-name{font-size:13.5px;line-height:1.22;white-space:normal}
+html[data-device="mobile"] .card-style{font-size:11px;line-height:1.25;white-space:normal;color:#c5ceba}
+html[data-device="mobile"] .card-price{font-size:12px}
 html[data-device="mobile"] .seat-locator,html[data-device="mobile"] .stake-adjust{display:none}
-html[data-device="mobile"] .chip{height:44px}
-html[data-device="mobile"] .chip svg{width:34px;height:34px}
-html[data-device="mobile"] .chip.active:before{width:39px;height:39px}
+html[data-device="mobile"] .chip{height:38px}
+html[data-device="mobile"] .chip svg{width:30px;height:30px}
+html[data-device="mobile"] .chip.active:before{width:35px;height:35px}
 
 html[data-device="tablet"] .wrap{width:min(860px,calc(100% - 32px))}
 html[data-device="tablet"] .machine-layout{display:flex;flex-direction:column;gap:15px}
@@ -359,6 +373,93 @@ html[data-device="desktop"] .runner-grid{grid-template-columns:repeat(6,minmax(0
 .audio-mix-toggles button{flex:1 1 auto;min-height:36px;padding:6px 10px;border:1px solid #4d5d46;border-radius:5px;background:#1f2c21;color:#dce4d2;font:550 12px/1.2 var(--sans)}
 .audio-mix-toggles button:hover{border-color:var(--gold)}
 .audio-mix-toggles button[aria-pressed=true]{background:#3a3f28;border-color:#d5b77c;color:#f4da9b}
+
+/* Mobile ergonomics: folded menus, smaller view controls, and crisp readability */
+@media(max-width:680px){
+ .topbar{height:46px;gap:4px}
+ .topbar .nav-item,.topbar .guide-link,.topbar .sound-button{height:34px;min-width:34px;padding:0 7px}
+ .topbar .sound-menu-btn{width:22px;height:34px}
+ .tool-rule{display:none}
+ .device-link{padding:4px 7px;font-size:9.5px}
+ .terminal .market-tabs button,.terminal .runner-choice,.terminal .place-button,.my-bets{min-height:38px;font-size:13px}
+ .terminal .field-label{font-size:11.5px;color:#cdd4c2}
+ .terminal .choice-name{font-size:13.5px}
+ .terminal .chip{height:38px}
+ .terminal .chip svg{width:30px;height:30px}
+ .terminal .chip.active:before{width:35px;height:35px}
+ .race-strip{padding:8px 10px;gap:8px}
+ .race-strip .strip-title{font-size:13px}
+ .race-strip #timerValue{font-size:17px}
+ .skip-race,.recall-finish{min-height:36px;min-width:36px}
+ .racecard-section .card-style{color:#c5ceba;font-size:11px;line-height:1.25}
+ #cabinet .feed-top{--square:30px;gap:3px;top:6px;left:6px;right:6px}
+ #cabinet .feed-top .glass-square,#cabinet.station-full .feed-top #fullButton{width:30px;min-width:30px;height:30px;min-height:30px;border-radius:5px}
+ #cabinet .feed-top .glass-square:after{display:none}
+ #cabinet .feed-top .console-sound-wrap .console-sound-menu-btn{width:20px;min-width:20px;height:30px;min-height:30px}
+ #cabinet .feed-top .feed-ident{display:none}
+ #cabinet .players-button{min-height:28px;padding:3px 7px;font-size:10.5px;gap:5px;border-radius:5px}
+ #cabinet .players-menu{width:min(248px,calc(100vw - 24px));opacity:.96;background:#121d16;box-shadow:0 10px 26px rgba(0,0,0,.68)}
+ #cabinet .players-list li{font-size:12px;padding:6px 7px}
+ #cabinet .players-actions button{min-height:34px;font-size:11.5px}
+ #cabinet .feed-bottom{left:6px;right:6px;bottom:6px;gap:4px;flex-wrap:wrap}
+ #cabinet .camera-button{min-height:30px;padding:4px 8px;font-size:11px;gap:5px}
+ #cabinet .orbit-tools{gap:3px;padding:2px 5px}
+ #cabinet .orbit-tools small{display:none}
+ #cabinet .orbit-tools button{width:26px;height:26px;min-width:26px;min-height:26px}
+ #cabinet .nose-aim{gap:3px;padding:2px 5px;max-width:100%}
+ #cabinet .nose-aim small{display:none}
+ #cabinet .nose-aim select{max-width:118px;font-size:11px;min-height:26px}
+ #cabinet .nose-step,#cabinet .nose-fx,#cabinet .overview-pip-btn{min-height:26px;padding:0 6px;font-size:10.5px}
+ #cabinet .feed-format{display:none}
+ #cabinet .picture-menu,.sound-menu{max-width:min(240px,calc(100vw - 16px))}
+ #cabinet .picture-menu button,.sound-menu button{min-height:36px;height:auto;padding:7px 9px;font-size:12.5px}
+ #cabinet .overview-pip{width:154px;padding:5px 7px;top:40px;right:6px}
+ #cabinet .overview-pip li{font-size:10.5px}
+ #cabinet.docked-rail #railBay{max-height:none;padding:6px;background:#132018;border-top:1px solid #4c5d49}
+ #cabinet.docked-rail #railBay #livePanel{width:100%;max-height:none;display:grid;grid-template-columns:1fr;gap:6px;background:#17271d;border-color:#5f7058}
+ #cabinet.docked-rail #railBay #livePanel #trackTickets{border-right:0;border-bottom:1px solid #475a45;padding-bottom:4px}
+ #cabinet.docked-rail #railBay #livePanel #trackMonitor{grid-column:1;grid-row:auto}
+ #cabinet #livePanel .track-fold{min-height:34px;font-size:13px}
+ #cabinet #livePanel .track-slip{font-size:11.5px;min-height:32px}
+ #cabinet #livePanel #railBoard li{font-size:11.5px;gap:5px;padding:4px 0}
+}
+html[data-device="mobile"] #cabinet .feed-top{--square:30px;gap:3px;top:6px;left:6px;right:6px}
+html[data-device="mobile"] #cabinet .feed-top .glass-square,html[data-device="mobile"] #cabinet.station-full .feed-top #fullButton{width:30px;min-width:30px;height:30px;min-height:30px;border-radius:5px}
+html[data-device="mobile"] #cabinet .feed-top .glass-square:after{display:none}
+html[data-device="mobile"] #cabinet .feed-top .console-sound-wrap .console-sound-menu-btn{width:20px;min-width:20px;height:30px;min-height:30px}
+html[data-device="mobile"] #cabinet .feed-top .feed-ident{display:none}
+html[data-device="mobile"] #cabinet .players-button{min-height:28px;padding:3px 7px;font-size:10.5px;gap:5px;border-radius:5px}
+html[data-device="mobile"] #cabinet .players-menu{width:min(248px,calc(100vw - 24px));opacity:.96;background:#121d16;box-shadow:0 10px 26px rgba(0,0,0,.68)}
+html[data-device="mobile"] #cabinet .players-list li{font-size:12px;padding:6px 7px}
+html[data-device="mobile"] #cabinet .players-actions button{min-height:34px;font-size:11.5px}
+html[data-device="mobile"] #cabinet .feed-bottom{left:6px;right:6px;bottom:6px;gap:4px;flex-wrap:wrap}
+html[data-device="mobile"] #cabinet .camera-button{min-height:30px;padding:4px 8px;font-size:11px;gap:5px}
+html[data-device="mobile"] #cabinet .orbit-tools{gap:3px;padding:2px 5px}
+html[data-device="mobile"] #cabinet .orbit-tools small{display:none}
+html[data-device="mobile"] #cabinet .orbit-tools button{width:26px;height:26px;min-width:26px;min-height:26px}
+html[data-device="mobile"] #cabinet .nose-aim{gap:3px;padding:2px 5px;max-width:100%}
+html[data-device="mobile"] #cabinet .nose-aim small{display:none}
+html[data-device="mobile"] #cabinet .nose-aim select{max-width:118px;font-size:11px;min-height:26px}
+html[data-device="mobile"] #cabinet .nose-step,html[data-device="mobile"] #cabinet .nose-fx,html[data-device="mobile"] #cabinet .overview-pip-btn{min-height:26px;padding:0 6px;font-size:10.5px}
+html[data-device="mobile"] #cabinet .feed-format{display:none}
+html[data-device="mobile"] #cabinet .picture-menu,html[data-device="mobile"] .sound-menu{max-width:min(240px,calc(100vw - 16px))}
+html[data-device="mobile"] #cabinet .picture-menu button,html[data-device="mobile"] .sound-menu button{min-height:36px;height:auto;padding:7px 9px;font-size:12.5px}
+html[data-device="mobile"] #cabinet .overview-pip{width:154px;padding:5px 7px;top:40px;right:6px}
+html[data-device="mobile"] #cabinet .overview-pip li{font-size:10.5px}
+html[data-device="mobile"] #cabinet.docked-rail #railBay{max-height:none;padding:6px;background:#132018;border-top:1px solid #4c5d49}
+html[data-device="mobile"] #cabinet.docked-rail #railBay #livePanel{width:100%;max-height:none;display:grid;grid-template-columns:1fr;gap:6px;background:#17271d;border-color:#5f7058}
+html[data-device="mobile"] #cabinet.docked-rail #railBay #livePanel #trackTickets{border-right:0;border-bottom:1px solid #475a45;padding-bottom:4px}
+html[data-device="mobile"] #cabinet.docked-rail #railBay #livePanel #trackMonitor{grid-column:1;grid-row:auto}
+html[data-device="mobile"] #cabinet #livePanel .track-fold{min-height:34px;font-size:13px}
+html[data-device="mobile"] #cabinet #livePanel .track-slip{font-size:11.5px;min-height:32px}
+html[data-device="mobile"] #cabinet #livePanel #railBoard li{font-size:11.5px;gap:5px;padding:4px 0}
+html[data-device="mobile"] .race-strip{padding:8px 10px;gap:8px}
+html[data-device="mobile"] .race-strip .strip-title{font-size:13px}
+html[data-device="mobile"] .race-strip #timerValue{font-size:17px}
+html[data-device="mobile"] .skip-race,html[data-device="mobile"] .recall-finish{min-height:36px;min-width:36px}
+html[data-device="mobile"] .terminal .field-label{font-size:11.5px;color:#cdd4c2}
+html[data-device="mobile"] .terminal .choice-name{font-size:13.5px}
+
 
 
 

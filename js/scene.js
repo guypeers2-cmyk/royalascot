@@ -102,7 +102,7 @@ function makeScene(canvas,machine){const mainCtx=canvas.getContext('2d',{alpha:f
  function filmOnly(){return actionPref==='film'||(actionPref==='auto'&&(slowDevice||!accelerated||quality.level===2));}
  function useFilm(){quality.software(false);signalQuality();filmLevel=quality.level;actionFilm=true;filmLimited=false;oc.hidden=true;canvas.style.visibility='visible';vr.dataset.actionRenderer='film';filmDue=0;size();budget.reset();}
  function orbitModeFor(v){return v===6?'chase':v===7?'overview':v===8?'nose':'orbit';}
- function lens(v){if(v===0||v===5)v=1;quality.software(false);filmLevel=quality.level;cancel();quality.reset();c=v;seat.enable(false);actionFilm=false;budget.reset();delete vr.dataset.actionRenderer;
+ function lens(v){if(v===0||v===1||v===4||v===5)v=3;quality.software(false);filmLevel=quality.level;cancel();quality.reset();c=v;seat.enable(false);actionFilm=false;budget.reset();delete vr.dataset.actionRenderer;
    if(v===6&&(actionPref==='3d'||actionPref==='auto'&&quality.level<2)&&accelerated===undefined)accelerated=optics.acceleration(oc);
    const modeled=v===3||v===7||v===8||v===6&&!filmOnly();oc.hidden=!modeled;canvas.style.visibility=modeled?'hidden':'visible';
    oc.setAttribute('aria-label',v===6?'Action cam: free-moving coverage of the current contest.':v===7?'Track overview: unobstructed three-dimensional overview of the oval course.':v===8?'Horse nose cam: first-person action view mounted on the nose of the horse.':'Three-dimensional Royal Ascot cabinet. Drag to orbit; use the zoom buttons to approach the table.');

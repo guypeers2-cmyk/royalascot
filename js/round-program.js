@@ -31,8 +31,8 @@ window.RoundProgram=function(game,act){
  tabs.onclick=e=>{const b=e.target.closest('[data-official]');if(b){finishPage=b.dataset.official;area.scrollTop=0;fitFinish();}};
  const resizeFinish=new ResizeObserver(fitFinish);resizeFinish.observe(area);document.fonts?.ready.then(fitFinish);
  let airPager=null,fitFrame=0;const fitAir=()=>{if(!fitFrame)fitFrame=requestAnimationFrame(()=>{fitFrame=0;airPager?.fit();});},airSizer=new ResizeObserver(fitAir);
- let camera=0,finishOpen=false,cardKey='',summaryKey='',lastSecond=-1,lastFinishers=-1,reportId=-1,timeline=null,reportKey='';
- function layers(){const main=s.phase==='betting'&&camera===4,finish=s.phase==='result'&&finishOpen,trackOnly=camera===7;
+ let camera=3,finishOpen=false,cardKey='',summaryKey='',lastSecond=-1,lastFinishers=-1,reportId=-1,timeline=null,reportKey='';
+ function layers(){const main=false,finish=s.phase==='result'&&finishOpen,trackOnly=camera===7;
    tube.hidden=!main;$('finishSlate').hidden=!finish;cab.classList.toggle('console-stage',main);cab.classList.toggle('finish-stage',finish);cab.classList.toggle('track-only-view',trackOnly);cab.parentElement?.classList.toggle('track-only-layout',trackOnly);room.classList.toggle('program-wide',main||finish);
    $('recallFinish').hidden=s.phase!=='result'||finish;$('raceWire').hidden=s.phase!=='race';if(main)glass.queue();if(finish)fitFinish();
  }

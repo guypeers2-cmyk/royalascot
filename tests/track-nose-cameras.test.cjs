@@ -58,7 +58,7 @@ test('scene.js, round-program.js, and app.js route cameras 7 and 8 cleanly and p
 
   const appSrc = read('js/app.js');
   assert.ok(appSrc.includes("'Track overview','Horse nose cam'"));
-  assert.ok(appSrc.includes("/^[1234678]$/"));
+  assert.ok(appSrc.includes("/^[23678]$/"));
   assert.ok(appSrc.includes("function noseUI()"));
   assert.ok(appSrc.includes("activeCameras[(idx+1)%activeCameras.length]"));
   assert.ok(appSrc.includes("function startPhotoReplay()"));
@@ -190,14 +190,14 @@ test('audio channel mix (mute horses / commentary / all), camera removals (0 & 5
   assert.ok(folioSrc.includes('audioMixCard') && folioSrc.includes('data-folio-audio='), 'station-folios Sound tab renders interactive Audio mix card');
 
   const appSrc = read('js/app.js');
-  assert.ok(appSrc.includes('activeCameras=[1,2,3,4,6,7,8]') && appSrc.includes('if(n===0||n===5)n=1;'), 'app.js restricts activeCameras and guards 0/5');
+  assert.ok(appSrc.includes('activeCameras=[2,3,6,7,8]') && appSrc.includes('if(n===0||n===1||n===4||n===5)n=3;'), 'app.js restricts activeCameras to [2,3,6,7,8] and guards 0/1/4/5');
   assert.ok(appSrc.includes('toggleAudioChannel') && appSrc.includes("addEventListener('ascot:audio-mix'"), 'app.js wires channel mute UI and syncs folio events');
 
   const sceneSrc = read('js/scene.js');
-  assert.ok(sceneSrc.includes('if(v===0||v===5)v=1;'), 'scene.js guards lens(0/5) back to 1');
+  assert.ok(sceneSrc.includes('if(v===0||v===1||v===4||v===5)v=3;'), 'scene.js guards lens(0/1/4/5) back to 3');
 
   const deskSrc = read('js/fullscreen-desk.js');
-  assert.ok(deskSrc.includes('lastLook=1') && deskSrc.includes('if(n===0||n===5)n=1;'), 'fullscreen-desk defaults lastLook to 1 and guards 0/5');
+  assert.ok(deskSrc.includes('lastLook=3') && deskSrc.includes('if(n===0||n===1||n===4||n===5)n=3;'), 'fullscreen-desk defaults lastLook to 3 and guards 0/1/4/5');
 
   const orbitSrc = read('js/orbit.js');
   assert.ok(orbitSrc.includes('scene.add(sun.target)') && orbitSrc.includes('function updateShadowFrustum'), 'orbit.js dynamically aims and tightens directional shadow frustum');
@@ -209,5 +209,25 @@ test('audio channel mix (mute horses / commentary / all), camera removals (0 & 5
 
   const sulkySrc = read('js/sulky.js');
   assert.ok(sulkySrc.includes('MeshPhysicalMaterial') && sulkySrc.includes('clearcoat:.85'), 'sulky.js upgrades wheel covers to MeshPhysicalMaterial clearcoat');
+});
+
+test('mobile ergonomics (folded menus, smaller buttons, readability) and removal of Rail panorama (1) & Console close-up (4)', () => {
+  const html = read('index.html');
+  assert.ok(!html.includes('data-camera="1"') && !html.includes('data-camera="4"'), 'Rail panorama (1) and Console close-up (4) removed from cameraMenu');
+  assert.ok(!html.includes('value="1"') && !html.includes('value="4"'), 'Rail panorama (1) and Console close-up (4) removed from deskCamera');
+
+  const css = read('styles.css');
+  assert.ok(css.includes('html[data-device="mobile"] .runner-grid{grid-template-columns:repeat(2,minmax(0,1fr))'), 'mobile runner grid uses readable 2 columns');
+  assert.ok(css.includes('html[data-device="mobile"] .market-pane{display:flex;flex-direction:column'), 'mobile market pane uses clean vertical stack');
+  assert.ok(css.includes('--square:30px') && css.includes('#cabinet .players-menu{width:min(248px,calc(100vw - 24px))'), 'mobile uses compact 30px view buttons and crisp folded players menu');
+
+  const mpSrc = read('js/multiplayer-client.js');
+  assert.ok(mpSrc.includes('isCompactViewport') && mpSrc.includes('playersPinnedOpen=!isCompactViewport()'), 'folds active players menu by default on mobile');
+
+  const trackSrc = read('js/track-tickets.js');
+  assert.ok(trackSrc.includes('isCompact') && trackSrc.includes('let docked=isCompact()'), 'docks livePanel cleanly below viewWindow on mobile by default');
+
+  const progSrc = read('js/round-program.js');
+  assert.ok(progSrc.includes('const main=false,finish='), 'Console close-up stage disabled after camera 4 removal');
 });
 

@@ -25,14 +25,18 @@
    function recommendDevice(){const w=root.innerWidth||1280;return w<=580?'mobile':w<=1024?'tablet':'desktop';}
    function getDeviceMode(){try{const v=localStorage.getItem(DEVICE);if(v==='mobile'||v==='tablet'||v==='desktop')return v;}catch{}return recommendDevice();}
    let currentDevice=getDeviceMode();
+   const isCompactViewport=()=>currentDevice==='mobile'||(typeof root.innerWidth==='number'&&root.innerWidth<=680);
+   playersPinnedOpen=!isCompactViewport();
    function applyDeviceMode(mode){
      if(mode!=='mobile'&&mode!=='tablet'&&mode!=='desktop')mode=recommendDevice();
      currentDevice=mode;
+     if(mode==='mobile')playersPinnedOpen=false;
      if(typeof document!=='undefined'){
        document.documentElement.dataset.device=mode;
        const lbl=$('deviceLabel');if(lbl)lbl.textContent=deviceLabelMap[mode];
      }
      try{localStorage.setItem(DEVICE,mode);}catch{}
+     syncPlayersMenuOpen();
      try{root.dispatchEvent(new Event('resize'));}catch{}
    }
    applyDeviceMode(currentDevice);
@@ -183,7 +187,7 @@
 
    function switchPlayerPrompt(msg='Enter your username and 4-digit PIN.'){
      const menu=$('playersMenu'),btn=$('playersButton');
-     playersPinnedOpen=true;
+     playersPinnedOpen=!isCompactViewport();
      if(menu){menu.hidden=true;btn?.setAttribute('aria-expanded','false');}
      if(enabled){const oldTok=token;joined=false;token='';profile=null;try{localStorage.removeItem(KEY);}catch{}sendLeave(oldTok);}
      else{localUser=null;}
@@ -207,11 +211,19 @@
      btn.addEventListener('click',()=>{
        const open=menu.hidden;
        playersPinnedOpen=open;
-       for(const [mId,bId] of [['cameraMenu','cameraButton'],['qualityMenu','qualityButton'],['actionMenu','actionButton']]){
+       for(const [mId,bId] of [['cameraMenu','cameraButton'],['qualityMenu','qualityButton'],['actionMenu','actionButton'],['soundMenu','soundMenuButton'],['soundMenu','consoleSoundMenuButton']]){
          const m=$(mId);if(m&&!m.hidden){m.hidden=true;$(bId)?.setAttribute('aria-expanded','false');}
        }
        menu.hidden=!open;btn.setAttribute('aria-expanded',String(open));
      });
+     if(typeof document!=='undefined'&&!document.documentElement.dataset.playersOutsideBound){
+       document.documentElement.dataset.playersOutsideBound='1';
+       document.addEventListener('click',e=>{
+         if(!isCompactViewport())return;
+         const m=$('playersMenu');
+         if(m&&!m.hidden&&!e.target.closest('#playersWrap')){playersPinnedOpen=false;syncPlayersMenuOpen();}
+       });
+     }
      copy?.addEventListener('click',async()=>{
        if(!tableCode)return;
        try{await navigator.clipboard.writeText(tableCode);copy.textContent='Copied!';setTimeout(()=>{copy.textContent='Copy code';},1400);}catch{notify('Table join code: '+tableCode);}
