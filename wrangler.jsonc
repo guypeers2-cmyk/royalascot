@@ -1,0 +1,32 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "royalascot",
+  "main": "worker/index.js",
+  "compatibility_date": "2026-11-18",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "SHARED_TABLE",
+        "class_name": "SharedTable"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["SharedTable"]
+    }
+  ],
+  "vars": {
+    "ASCOT_TABLE_CODE": "ASCOT26"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

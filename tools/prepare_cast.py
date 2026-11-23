@@ -1,11 +1,14 @@
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
-import cv2,numpy as np,math,base64
+import cv2,numpy as np,math,sys
 from scipy.spatial import Delaunay
 from scipy.ndimage import distance_transform_edt,gaussian_filter
 from pathlib import Path
 root=Path(__file__).resolve().parents[1];q=root/'art-src';out=root/'assets';W,H=1150,642
 im=np.asarray(Image.open(q/'runner-master.png').convert('RGB').resize((W,H),Image.Resampling.LANCZOS)).copy();a=im.astype(float);r,g,b=a.transpose(2,0,1);y,x=np.mgrid[0:H,0:W]
 ex=np.minimum(r,b)-g;bg=(ex>45)&(b>r*.66);mask=(~bg).astype('uint8');mask[y<35]=0;mask[(y>565)&~(((x>516)&(x<564)&(y<586))|((x>823)&(x<877)&(y<584)))]=0;mask[(x>605)&(x<632)&(y>381)&(y<425)]=0
+# Remove the old plinth below the hoof soles (its edge is not a fetlock).
+for yy in range(567,586):
+    l1,r1=np.interp(yy,[567,575,580,585],[521,522,525,532]),np.interp(yy,[567,575,580,585],[552,557,555,547]);l2,r2=np.interp(yy,[567,575,580,585],[834,835,840,848]),np.interp(yy,[567,575,580,585],[867,871,869,861]);mask[yy]*=(((x[yy]>=l1)&(x[yy]<=r1))|((x[yy]>=l2)&(x[yy]<=r2)))
 # Keep the enclosed spaces between stirrups and legs transparent. Remove only loose green sled/shadow pixels.
 n,lb,st,ce=cv2.connectedComponentsWithStats(mask);keep=1+np.argmax(st[1:,cv2.CC_STAT_AREA]);mask=(lb==keep).astype('uint8');
 # Remove chroma fringing at the antialiased outline using the nearest uncontaminated pigment.
@@ -35,8 +38,12 @@ for i in range(6):
   skin=s.copy();glyph=Image.new('RGBA',(56,65));d=ImageDraw.Draw(glyph);d.text((28,32),str(i+1),font=font,anchor='mm',fill=(27,26,22,255));
   if reverse:glyph=glyph.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
   glyph=glyph.rotate(-5.0,Image.Resampling.BICUBIC,expand=False);skin.alpha_composite(glyph,(519,218));fronts.append(skin.crop(box))
+ # Two-density, numbered portraits for inspecting the actual miniature on the CRT.
+ detail=fronts[0].copy();detail.thumbnail((620,390),Image.Resampling.LANCZOS);detail.save(out/f'profile-{i+1}.webp',quality=93,method=5)
+ if '--profiles-only' in sys.argv: continue
  full=Image.new('RGBA',(fronts[0].width*2,fronts[0].height));full.paste(fronts[0],(0,0));full.paste(fronts[1],(fronts[0].width,0));# Provide an opaque nearest-pigment gutter around the sculpt for watertight edge sampling.
  rgba=np.array(full);alpha=rgba[:,:,3]>200;ind=distance_transform_edt(~alpha,return_distances=False,return_indices=True);rgb=rgba[:,:,:3].copy();rgb[~alpha]=rgb[ind[0][~alpha],ind[1][~alpha]];Image.fromarray(rgb).save(out/f'cast-{i+1}.webp',quality=94,method=5);portrait=fronts[0].copy();portrait.thumbnail((310,195),Image.Resampling.LANCZOS);portrait.save(out/f'card-{i+1}.webp',quality=92,method=5);images.append(portrait)
+if '--profiles-only' in sys.argv: raise SystemExit(0)
 # A watertight two-sided sculpt of the photographic mould. The broad flanks and narrow lower
 # limbs carry distinct thicknesses; front and rear legs alternate across the depth axis.
 cont,hi=cv2.findContours(mask,cv2.RETR_LIST,cv2.CHAIN_APPROX_NONE);points=[]
@@ -51,7 +58,9 @@ for tri in tris:
  a,b,c=pts[tri];v=[(a+b+c)/3,(a+b)/2,(b+c)/2,(a+c)/2,(2*a+b+c)/4,(a+2*b+c)/4,(a+b+2*c)/4];V=np.int32(np.rint(v));
  if np.all(mask[V[:,1],V[:,0]]): good.append(tri)
 tri=np.array(good);used=np.unique(tri);remap=np.full(len(pts),-1);remap[used]=np.arange(len(used));tri=remap[tri];pts=pts[used];N=len(pts);X,Y=pts.T;dist=cv2.distanceTransform(mask,cv2.DIST_L2,5)[Y,X];
-gauss=lambda xx,yy,rx,ry:np.exp(-(((X-xx)/rx)**4+((Y-yy)/ry)**4));radius=6+53*gauss(544,274,189,115)+23*gauss(760,215,80,105)+18*gauss(872,149,86,76)+18*gauss(613,135,80,65)+15*gauss(694,78,46,38)+16*gauss(543,174,65,40);z=radius*np.sqrt(1-(1-np.clip((dist-.5)/radius,0,1))**2);leg=np.clip((Y-311)/140,0,1);rear=X<605;far=np.where(rear,X<405+(Y-350)*.22,X<720+(Y-361)*.66);zc=leg*np.where(far,-29,30)
+gauss=lambda xx,yy,rx,ry:np.exp(-(((X-xx)/rx)**4+((Y-yy)/ry)**4));radius=6+53*gauss(544,274,189,115)+23*gauss(760,215,80,105)+18*gauss(872,149,86,76)+18*gauss(613,135,80,65)+15*gauss(694,78,46,38)+16*gauss(543,174,65,40);z=radius*np.sqrt(1-(1-np.clip((dist-.5)/radius,0,1))**2);leg=np.clip((Y-311)/140,0,1);rear=X<605;# Splines follow the AIR GAP between legs, not straight lines through knees
+# or fetlocks. At a merged shoulder blend depth and phase over the root.
+rearSplit=np.interp(Y,[312,373,380,405,451,503,586],[419,420,419,395,378,371,370]);foreSplit=np.interp(Y,[340,380,408,420,440,465,490,510,531,586],[710,752,779,792,811,824,839,850,865,926]);split=np.where(rear,rearSplit,foreSplit);blend=np.where(rear,np.clip((380-Y)*.46+4,4,20),np.clip((409-Y)*.44+4,4,22));far=np.clip(.5+(split-X)/(2*blend),0,1);far=far*far*(3-2*far);zc=leg*(30-59*far)
 xx=(X-568)/930;yy=(586-Y)/930+.019;pos=np.r_[np.stack([xx,yy,(zc+z)/930],-1),np.stack([xx,yy,(zc-z)/930],-1)];U=(X-box[0])/(box[2]-box[0]);V=1-(Y-box[1])/(box[3]-box[1]);uv=np.r_[np.stack([U*.5,V],1),np.stack([.5+U*.5,V],1)]
 # Normals on the front surface point toward the side camera (+Z).
 tri=tri[:,::-1];idx=list(map(list,tri))+list(map(list,tri[:,::-1]+N));edges={}
@@ -64,8 +73,10 @@ perimeter=np.unique([u for pair in edges.values() if pair is not None for u in p
 for v in edges.values():
  if v is not None:
   a,b=v;idx.extend([[a,shift[b],b],[a,shift[a],shift[b]]])
-base64str=lambda a:base64.b64encode(np.ascontiguousarray(a).tobytes()).decode();idx=np.array(idx,dtype='<u2');
+idx=np.array(idx,dtype='<u2');
 # Store the four leg motion weights and a per-vertex phase as compact bytes.
-weights=np.clip((Y-np.where(rear,312,340))/255,0,1)**1.18;phase=np.where(rear,0,math.pi)+np.where(far,1.72,0);weights=np.r_[weights,weights,weights[perimeter]];phase=np.r_[phase,phase,phase[perimeter]];
-js="/* Textured mechanical carrier derived from the new side-profile mould. Geometry, pigment and motion are shared by the photographic and orbit cameras. */\n"+"window.CarrierMeshData=function(){const b=s=>Uint8Array.from(atob(s),x=>x.charCodeAt(0));return {pos:Float32Array.from(new Int16Array(b('"+base64str(np.int16(np.rint(pos*25000)))+"').buffer),v=>v/25000),uv:Float32Array.from(new Uint16Array(b('"+base64str(np.uint16(np.clip(np.rint(uv*65535),0,65535)))+"').buffer),v=>v/65535),idx:new Uint16Array(b('"+base64str(idx)+"').buffer),weights:Float32Array.from(b('"+base64str(np.uint8(weights*255))+"'),v=>v/255),phase:Float32Array.from(b('"+base64str(np.uint8(phase/6.283185*255))+"'),v=>v/255*6.283185)}};\n";(root/'js/mould.js').write_text(js)
+weights=np.clip((Y-np.where(rear,312,340))/255,0,1)**1.18;phase=np.where(rear,0,math.pi)+1.72*far;weights=np.r_[weights,weights,weights[perimeter]];phase=np.r_[phase,phase,phase[perimeter]];
+from mould_pack import write_mould
+write_mould(root,np.int16(np.rint(pos*25000)),np.uint16(np.clip(np.rint(uv*65535),0,65535)),idx,
+            np.uint8(weights*255),np.uint8(phase/6.283185*255),N,len(tri))
 print('mould',N*2,'vertices',len(idx),'triangles')

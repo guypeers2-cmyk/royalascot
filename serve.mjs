@@ -1,18 +1,19 @@
 // Self-hostable static cabinet plus an authoritative shared table API.
 import http from 'node:http';import fs from 'node:fs';import path from 'node:path';import{fileURLToPath}from'node:url';
 import sparsePlates from './tools/sparse-plates.cjs';import roomModule from './server-room.cjs';
-const {createRoom}=roomModule,root=path.dirname(fileURLToPath(import.meta.url)),sealed=sparsePlates(root),room=createRoom({dataDir:process.env.ASCOT_DATA?path.resolve(process.env.ASCOT_DATA):path.join(root,'data'),joinCode:process.env.ASCOT_TABLE_CODE});
+const {createRoom}=roomModule,root=path.dirname(fileURLToPath(import.meta.url)),sealed=sparsePlates(root),room=createRoom({dataDir:process.env.ASCOT_DATA?path.resolve(process.env.ASCOT_DATA):path.join(root,'data'),joinCode:process.env.ASCOT_TABLE_CODE||'ASCOT26'});
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.webp':'image/webp','.woff':'font/woff','.m4a':'audio/mp4','.mp3':'audio/mpeg','.ogg':'audio/ogg','.flac':'audio/flac','.txt':'text/plain; charset=utf-8'};
 function json(res,status,value){const out=JSON.stringify(value);res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Content-Length':Buffer.byteLength(out),'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Frame-Options':'SAMEORIGIN'});res.end(out);}
 function bearer(req){const m=/^Bearer ([A-Za-z0-9_-]{32,128})$/.exec(req.headers.authorization||'');return m?.[1]||'';}
 async function body(req){let s='';for await(const chunk of req){s+=chunk;if(s.length>8192)throw Error('Request is too large.');}if(!s)return {};try{return JSON.parse(s)}catch{throw Error('Request body must be valid JSON.');}}
-function sameOrigin(req){if(!req.headers.origin)return true;try{return new URL(req.headers.origin).host===req.headers.host;}catch{return false;}}
+function sameOrigin(req){if(!req.headers.origin)return true;try{const host=String(req.headers['x-forwarded-host']||req.headers.host||'').split(',')[0].trim();return new URL(req.headers.origin).host===host;}catch{return false;}}
 async function api(req,res,url){if(req.method==='GET'&&url.pathname==='/api/info'){json(res,200,{enabled:true,table:'Royal Ascot · Shared Table'});return true;}
  if(!url.pathname.startsWith('/api/'))return false;if(!sameOrigin(req)){json(res,403,{error:'Cross-origin requests are not allowed.'});return true;}
  try{
-   if(req.method==='POST'&&url.pathname==='/api/join'){const data=await body(req),joined=room.register({name:data.name,code:data.code,token:data.token});json(res,200,{token:joined.token,reconnected:joined.reconnected,tableCode:room.joinCode,state:room.snapshot(joined.token)});return true;}
+   if(req.method==='POST'&&url.pathname==='/api/join'){const data=await body(req),joined=room.register({name:data.name,code:data.code,token:data.token,pin:data.pin});json(res,200,{token:joined.token,reconnected:joined.reconnected,tableCode:room.joinCode,state:room.snapshot(joined.token)});return true;}
    if(req.method==='GET'&&url.pathname==='/api/state'){const token=bearer(req),state=room.snapshot(token);if(!state){json(res,401,{error:'This player seat is not recognized. Rejoin with the table code.'});return true;}json(res,200,state);return true;}
    if(req.method==='POST'&&url.pathname==='/api/action'){const token=bearer(req),data=await body(req);if(!room.authenticated(token)){json(res,401,{error:'This player seat is not recognized. Rejoin with the table code.'});return true;}json(res,200,room.action(token,data.action,data.data||{}));return true;}
+   if(req.method==='POST'&&url.pathname==='/api/leave'){const token=bearer(req);if(token)room.leave?.(token);json(res,200,{ok:true});return true;}
    json(res,404,{error:'No such table endpoint.'});
  }catch(error){json(res,400,{error:error?.message||'The table could not complete that request.'});}return true;
 }

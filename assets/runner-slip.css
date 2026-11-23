@@ -1,0 +1,89 @@
+/* The selected horse on the betting glass. One dossier: identity, four
+   ratings, five recent finishes and the real prices. No hidden data sheets. */
+:is(#tubeProfile,#terminalProfile) .runner-card { --ink:#f3f1e7; --muted:#c1d1d2; --rule:#7c999952; display:grid; grid-template-columns:minmax(0,1fr); grid-template-areas:'id' 'ratings' 'form' 'prices'; align-content:start; overflow:visible; background:#193544; color:var(--ink); border:1px solid #68848c; border-radius:5px; box-shadow:none; }
+:is(#tubeProfile,#terminalProfile) .runner-card[data-layout=wide]:not(.enlarged) {grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:'id form' 'ratings prices';align-items:stretch;}
+:is(#tubeProfile,#terminalProfile) .runner-card .scout-hero {grid-area:id;min-width:0;}
+:is(#tubeProfile,#terminalProfile) .runner-card:not(.enlarged) .scout-hero {display:grid;grid-template-columns:clamp(58px,24cqw,90px) minmax(0,1fr) auto;align-items:center;gap:6px;padding:4px 7px 4px 4px;background:linear-gradient(105deg,#274858,#1c3849 85%);border-radius:4px 4px 0 0;}
+:is(#tubeProfile,#terminalProfile) .runner-card:not(.enlarged) .scout-portrait {width:100%;height:48px;min-height:44px;align-self:center;border:1px solid #66808c55;border-radius:3px;}
+:is(#tubeProfile,#terminalProfile) .runner-card:not(.enlarged) .scout-portrait img {width:100%;height:100%;object-fit:contain;}
+.runner-card .scout-zoom {bottom:1px;right:1px;min-width:14px;padding:0 2px;text-align:center;font:600 12px/1 var(--mono);}
+:is(#tubeProfile,#terminalProfile) .runner-card .scout-id {display:block;min-width:0;padding:0;}
+.runner-card .name-line {display:flex;align-items:center;gap:5px;}
+.runner-card .name-line .cloth {width:20px;height:20px;flex:none;font-size:.78rem;}
+:is(#tubeProfile,#terminalProfile) .runner-card .scout-id h3 {font:600 calc(max(18px,1.3rem) - 1px)/1.03 var(--serif);letter-spacing:0;color:#fff0cd;margin:0;}
+:is(#tubeProfile,#terminalProfile) .runner-card .scout-id p {padding:0;border:0;margin:3px 0 0;color:#d6e1df;font:500 .76rem/1.12 var(--sans);overflow-wrap:anywhere;}
+.runner-card .scout-id p i {font-style:normal;color:#92b0b5;}
+:is(#tubeProfile,#terminalProfile) .runner-card .scout-pair {display:flex;align-items:center;flex-wrap:nowrap;gap:2px;padding:0;border:0;}
+:is(#tubeProfile,#terminalProfile) .runner-card .scout-pair button {width:36px;min-width:36px;min-height:44px;padding:2px 0;font:600 .78rem/1 var(--mono);}
+:is(#tubeProfile,#terminalProfile) .runner-card .trait-panel {grid-area:ratings;min-width:0;margin:0;padding:5px 8px 7px;border:0;border-top:1px solid var(--rule);background:#193544;}
+.runner-card .trait-head {align-items:baseline;justify-content:space-between;}
+:is(#tubeProfile,#terminalProfile) .runner-card .trait-head h4 {font:600 .85rem/1.08 var(--sans);color:#f2e6c4;}
+.runner-card .trait-head[data-pairs] {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}
+.runner-card .trait-head[data-pairs]>b {color:#f2e6c4;font:600 .77rem/1.1 var(--sans);}
+.runner-card .trait-head>span {font:500 .7rem/1.08 var(--mono);color:var(--muted);}
+:is(#tubeProfile,#terminalProfile) .runner-card .trait-grid {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:4px 0 0;gap:6px;list-style:none;}
+:is(#tubeProfile,#terminalProfile) .runner-card .trait-grid li>div {display:grid;align-items:baseline;justify-content:start;gap:1px;}
+.runner-card .trait-grid abbr {color:var(--muted);font:500 max(11px,.72rem)/1.12 var(--sans);text-decoration:none;}
+:is(#tubeProfile,#terminalProfile) .runner-card .trait-grid strong {font:600 max(14px,.95rem)/1.1 var(--mono);color:var(--stat-ink,#f3e7bc);}
+:is(#tubeProfile,#terminalProfile) .runner-card .trait-grid li>i {height:3px;margin:3px 0 0;}
+:is(#tubeProfile,#terminalProfile) .runner-card .trait-grid li>i b {background:var(--stat-ink,#b6c3ba);}
+:is(#tubeProfile,#terminalProfile) .runner-card .scout-form {grid-area:form;display:grid;min-width:0;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:7px;padding:5px 8px;border-top:1px solid var(--rule);}
+:is(#tubeProfile,#terminalProfile) .runner-card .scout-form h4 {font:600 .84rem/1.1 var(--sans);color:#f2e6c4;}
+.runner-card .scout-form h4 small {display:block;margin-top:2px;font:500 .68rem/1.05 var(--sans);color:var(--muted);}
+:is(#tubeProfile,#terminalProfile) .runner-card .scout-form-list {display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;margin:0;}
+:is(#tubeProfile,#terminalProfile) .runner-card .scout-form-list li {display:grid;align-content:center;justify-items:center;gap:1px;min-width:0;margin:0;padding:3px 1px;border:1px solid #6b858d8c;border-radius:3px;background:#203f4b;}
+.runner-card .scout-form-list li:first-child {border-color:#b1a079;}
+.runner-card .scout-form-list b {font:600 max(13px,.82rem)/1.05 var(--mono);color:#ffebc3;}
+.runner-card .scout-form-list small {color:var(--muted);font:500 max(9px,.6rem)/1 var(--mono);}
+:is(#tubeProfile,#terminalProfile) .runner-card .scout-form-list .no-run {background:none;color:#91a5a8;border-color:#607c834d;}
+.runner-sr {position:absolute!important;width:1px;height:1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
+:is(#tubeProfile,#terminalProfile) .runner-card .scout-quotes {display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1fr) minmax(0,1.2fr);align-items:center;gap:0;min-width:0;margin:0;padding:0;border:0;background:transparent;}
+.runner-card .scout-quotes>div {display:grid;align-content:center;justify-items:center;gap:1px;padding:0 2px;}
+.runner-card .scout-quotes dt {white-space:normal;font:500 max(11px,.73rem)/1.08 var(--sans);color:#d5dfdf;}
+.runner-card .scout-quotes dt small {font:inherit;}
+.runner-card .scout-quotes dd {margin:0;color:#e9ece3;font:600 max(14px,.92rem)/1.08 var(--mono);white-space:nowrap;}
+.runner-card .scout-quotes .active-price dd {color:#ffdb93;}
+.runner-card .scout-quotes [data-quote=weight] dd {color:#cddcd8;font-size:max(12px,.8rem);}
+.runner-card .runner-odds {grid-area:prices;display:grid;grid-template-columns:auto minmax(0,1fr);gap:5px;align-items:center;min-width:0;padding:5px 8px;border-top:1px solid var(--rule);border-radius:0 0 4px 4px;background:#142e3c;}
+.runner-card .runner-odds h4 {margin:0;color:#f2e6c4;font:600 .84rem/1.1 var(--sans);}
+/* Slim keeps all four figures, actual form and prices; only their spacing
+   and the extra date line change. The source of each finish stays named. */
+:is(#tubeProfile,#terminalProfile) .runner-card[data-density=slim]:not(.enlarged) .scout-hero {grid-template-columns:46px minmax(0,1fr) auto;gap:4px;padding:2px 4px;}
+:is(#tubeProfile,#terminalProfile) .runner-card[data-density=slim]:not(.enlarged) .scout-portrait {height:44px;}
+:is(#tubeProfile,#terminalProfile) .runner-card[data-density=slim] .scout-id h3 {font-size:calc(max(16px,1rem) - 1px);}
+:is(#tubeProfile,#terminalProfile) .runner-card[data-density=slim] .scout-id p {font-size:.69rem;line-height:1.05;margin-top:2px;}
+:is(#tubeProfile,#terminalProfile) .runner-card[data-density=slim] :is(.trait-panel,.scout-form,.runner-odds) {padding:3px 4px;}
+.runner-card[data-density=slim] .trait-head {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);}
+:is(#tubeProfile,#terminalProfile) .runner-card[data-density=slim] .trait-grid {margin:0;gap:5px;}
+.runner-card[data-density=slim] .scout-form-list small {display:none;}
+:is(#tubeProfile,#terminalProfile) .runner-card[data-density=slim] .scout-form h4 small {display:inline;margin:0 0 0 3px;}
+.runner-card[data-density=slim]:not(.enlarged) .scout-hero:has(.scout-pair) .silk-text,.runner-card[data-density=slim]:not(.enlarged) .scout-hero:has(.scout-pair) .scout-id p i {display:none;}
+.runner-card[data-density=slim] .scout-quotes dt small {display:none;}
+:is(#tubeProfile,#terminalProfile) .runner-card[data-density=slim] .scout-form-list li {padding:2px 1px;line-height:1;}
+@container scout (min-width:17.5rem) {
+ :is(#tubeProfile,#terminalProfile) .runner-card[data-density=slim] .trait-grid li>div {display:flex;align-items:baseline;justify-content:space-between;gap:2px;}
+}
+/* Lens is an explicit temporary view. Closing it restores the whole file. */
+#tubeProfile .runner-card.enlarged {display:flex;height:100%;min-height:0;}
+:is(#tubeProfile,#terminalProfile) .runner-card.enlarged :is(.scout-form,.runner-odds,.trait-panel,.scout-pair) {display:none;}
+#tubeProfile .runner-card.enlarged .scout-hero {display:flex;min-height:0;flex:1;flex-direction:column;align-items:stretch;}
+#tubeProfile .runner-card.enlarged .scout-portrait {min-height:0;flex:1;}
+#tubeProfile .runner-card.enlarged .scout-portrait img {position:absolute;inset:0;width:100%;height:100%;object-fit:contain;}
+:is(#tubeProfile,#terminalProfile) .runner-card.enlarged .scout-id {padding:3px 6px;}
+#terminalProfile .runner-card.enlarged .scout-hero {display:block;}
+#profileScreen {width:4.5rem;max-width:24vw;min-width:0;color:#eceddf;background:#1b3847;border:1px solid #67828d;border-radius:4px;font:600 .8rem/1 var(--sans);color-scheme:dark;}
+#roundConsole:not([data-profile-focus=true],[data-ticket-focus=true]) #profileScreen,#roundConsole:not([data-reading=profile],[data-reading=ticket]) #profileScreen {display:none;}
+#roundConsole:is([data-profile-focus=true],[data-ticket-focus=true]):is([data-reading=profile],[data-reading=ticket]) #screenPages {display:none;}
+#roundConsole:is([data-profile-focus=true],[data-ticket-focus=true]):is([data-reading=profile],[data-reading=ticket]) #tubeScroll {grid-template:auto minmax(0,1fr) / minmax(0,1fr);}
+#roundConsole:is([data-profile-focus=true],[data-ticket-focus=true]):is([data-reading=profile],[data-reading=ticket]) #glassStatus {grid-area:1/1;display:grid;align-items:center;grid-template-columns:auto minmax(0,1fr) auto auto;grid-template-rows:auto;gap:4px;padding:2px 4px;}
+#roundConsole:is([data-profile-focus=true],[data-ticket-focus=true]) #glassStatus>:not([hidden]) {grid-area:auto;}
+#roundConsole:is([data-profile-focus=true],[data-ticket-focus=true]) #glassStatus :is(.glass-money,.glass-clock,.race-id) {display:grid;gap:0;}
+#roundConsole:is([data-profile-focus=true],[data-ticket-focus=true]) #glassStatus .race-id h2 {font-size:.86rem;line-height:1;}
+#roundConsole:is([data-profile-focus=true],[data-ticket-focus=true]) #glassStatus .race-id small {font-size:.55rem;}
+#roundConsole:is([data-profile-focus=true],[data-ticket-focus=true]):is([data-reading=profile],[data-reading=ticket]) #tubeLayout {grid-area:2/1;padding:2px 4px;}
+#roundConsole #tubeProfile[data-overfull=true] {overflow:auto!important;}
+
+/* A pair may be wider than the cash key. On the compact receipt give its
+   name a full line and keep the enlarged terms beside a full-height Cancel. */
+#roundConsole[data-ticket-focus=true] #tubeTicket .log-label{padding:1px 0;gap:3px}
+#roundConsole[data-ticket-focus=true] #tubeTicket .tube-coins{margin-block:1px 2px}

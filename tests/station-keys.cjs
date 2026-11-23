@@ -1,0 +1,2 @@
+/* Navigate the actual visible station menu, even when a short folio is paged. */
+module.exports=L=>async function service(which){if(which==='monitor'&&await L('#deskTerminal').isVisible())return;await L('#floorMenuButton').click();const key=L(`[data-service="${which}"]`);for(let i=0;i<10&&!await key.isVisible();i++){const next=L('#folioPager [data-next]');if(!await next.isVisible()||await next.isDisabled())break;await next.click();}await key.click();};

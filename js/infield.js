@@ -1,0 +1,21 @@
+/* One working enamel tote, read from the same race clock as the six silks.
+   The side plate, the survey map, and the two 3D faces
+   all develop this little sign. No projected winner or ticket information. */
+(function(root){'use strict';
+ const W=576,H=54,board=Object.freeze({x:0,cz:0,width:1.18,height:.078,top:.115,z:.014});
+ function reading(g){const s=g.state;return s.phase==='result'?s.order.slice(0,6):s.phase==='race'?g.positions().slice(0,6):s.runners.map(h=>h.num);}
+ function create(g){const film=document.createElement('canvas');film.width=W;film.height=H;const c=film.getContext('2d'),caption=document.getElementById('toteText');let key='',tick='';
+   // Six enamel number shutters. On the physical board there are no rank
+   // labels, status strings, clock or names, even in the paddock.
+   const silk=['#ece9db','#292c31','#ad3c3a','#315d96','#d8ae4a','#276445'];
+   function paint(){const s=g.state,now=s.raceNo+':'+s.phase+':'+s.clock;if(tick===now)return false;tick=now;const nums=reading(g),mark=nums.join(' ');if(key===mark)return false;key=mark;if(caption)caption.textContent=mark;
+     c.fillStyle='#514c3e';c.fillRect(0,0,W,H);c.fillStyle='#dbc693';c.fillRect(1,1,W-2,H-2);c.fillStyle='#17231e';c.fillRect(3,3,W-6,H-6);
+     const step=(W-8)/6;c.font='bold 40px Georgia,serif';c.textAlign='center';c.textBaseline='middle';nums.forEach((n,i)=>{const x=4+step*i;c.fillStyle=silk[n-1];c.fillRect(x+1,5,step-2,H-10);c.fillStyle='#ffffff32';c.fillRect(x+2,6,step-4,1.5);c.fillStyle='#15151055';c.fillRect(x+2,H-8,step-4,2.5);c.fillStyle=n===1||n===5?'#20251e':'#fff9e8';c.fillText(String(n),x+step/2,H*.535);});return true;}
+   const C=root.AscotCourse,P=root.AscotParterre,b=board,ground=C.gardenPoint(b.x,0,b.cz),face=[C.gardenPoint(b.x-b.width/2,b.top,b.cz+b.z),C.gardenPoint(b.x+b.width/2,b.top,b.cz+b.z),C.gardenPoint(b.x-b.width/2,b.top-b.height,b.cz+b.z)];
+   // Cache the planting only, not the changing scoreboard. For the side
+   // plate, each corolla has height above the bed and an offset cast shadow.
+   const inks={};function garden(c,top,front){const key=top?'map':front?'near':'far';if(!inks[key]){const a=document.createElement('canvas'),s=top?320:2,X=top?-1.49:235,Y=top?-.147:318,W=top?2.98:680,H=top?.294:46;a.width=Math.ceil(W*s);a.height=Math.ceil(H*s);const g=a.getContext('2d');g.scale(s,s);g.translate(-X,-Y);const point=(x,y,z)=>top?{x,y:z}:C.gardenPoint(x,y,z),poly=(v,color)=>{g.beginPath();v.forEach(([x,z],i)=>{const p=point(x,.002,z);i?g.lineTo(p.x,p.y):g.moveTo(p.x,p.y);});g.closePath();g.fillStyle=color;g.fill();g.lineWidth=top?.002:.65;g.strokeStyle=top?'#829067':'#70794f';g.stroke();},dot=(x,y,rx,ry,color)=>{g.fillStyle=color;g.beginPath();g.ellipse(x,y,rx,ry,0,0,2*Math.PI);g.fill();};for(const bed of P.beds.filter(v=>top||v.face===(front?1:-1))){poly(bed.rim,'#394430');for(const q of [...bed.buds].sort((a,b)=>a.z-b.z)){const p=point(q.x,q.y,q.z),k=top?1:192,r=q.r*k;const sy=top?1:.58,leaf=(dx,dy,rx,ry,col)=>dot(p.x+dx*r,p.y+dy*r*sy,r*rx,r*ry*sy,col);leaf(.14,.77,1.59,1.06,'#334b32');leaf(-.56,.46,1.22,.82,'#587946');leaf(.70,.29,.91,.73,'#76924d');const m=q.turn;for(let j=0;j<5;j++){const a=m+j*1.25664,dx=.52*Math.cos(a),dy=.52*Math.sin(a);leaf(dx,dy+.17,.50,.54,j===3?'#a18a60':q.col);}leaf(-.08,-.07,.25,.22,'#e4bc64');}}inks[key]=[a,X,Y,W,H];}c.drawImage(...inks[key]);}
+   function photo(c){paint();c.save();garden(c,false,false);const [a,e,d]=face,l=e.x-a.x,h=d.y-a.y;c.fillStyle='rgba(22,30,15,.38)';c.beginPath();c.ellipse(ground.x+2,ground.y+.6,l*.50,2.1,0,0,2*Math.PI);c.fill();for(const dx of [-.37,.37]){const foot=C.gardenPoint(b.x+dx,0,b.cz),top=C.gardenPoint(b.x+dx,b.top-b.height+.002,b.cz);c.fillStyle='#60513a';c.fillRect(foot.x-1.6,top.y,3.2,foot.y-top.y);c.fillStyle='#c7b785';c.fillRect(foot.x-1.5,top.y,.9,foot.y-top.y);c.fillStyle='#877b5b';c.fillRect(foot.x-5,foot.y-1.1,10,1.6);}c.save();c.transform(l/W,(e.y-a.y)/W,(d.x-a.x)/H,h/H,a.x,a.y);c.fillStyle='#cfb98b';c.fillRect(-2,-3,W+4,H+4);c.drawImage(film,0,0);c.restore();garden(c,false,true);c.restore();}
+   paint();return {film,paint,photo,garden,ground};}
+ const api={board,reading,create};root.AscotInfield=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+})(globalThis);

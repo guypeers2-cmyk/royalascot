@@ -1,0 +1,30 @@
+/* The witnesses are vertices of the four photographed SOLES, not merely IK
+   endpoints. In +X-forward/+Y-up coordinates +Z is anatomical right. */
+'use strict';const {test}=require('node:test'),A=require('node:assert/strict'),G=require('../js/hind-gait'),S=require('../js/stride');
+const tau=2*Math.PI,near=(a,b,e,n='')=>A.ok(Math.abs(a-b)<=e,`${n}: ${a} ≠ ${b} ± ${e}`);
+const feet=[{name:'RH',byte:0,floor:.02008,offset:0},{name:'LH',byte:69,floor:.09320,offset:.5},{name:'RF',byte:127,floor:.07168,offset:.5},{name:'LF',byte:197,floor:.02224,offset:0}];
+test('one diagonal touchdown clock; extended loaded fore knee, articulating hock, unchanged bone lengths and equal ground speeds',()=>{const d=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);for(let i=0;i<480;i++){const t=i/480,ar=[];for(const [j,f] of feet.entries()){const v=G.trot(t,j>1,j%2),p=v.points,l=j>1?[.105,.133,.127]:[.113,.148,.105];for(let k=0;k<3;k++)near(d(p[k],p[k+1]),l[k],1e-6,f.name);ar.push(v.air);const u=(t+f.offset)%1;if(!v.air){if(!v.heel)near(p[4][1]+G.trunk(t),G.floor,1e-9);if(j>1)A.ok(d(p[1],p[3])>(l[1]+l[2])*.996,'a loaded carpus must not buckle');}if(u>.49&&u<.835)A.ok(p[4][1]+G.trunk(t)>.050);}A.equal(ar[0],ar[3]);A.equal(ar[1],ar[2]);A.ok(ar[0]||ar[1]);}for(const n of [1,2,3,4,5,6])near(S.stepLength({num:n,seed:3.7}),S.modelSize,1e-12);});
+test('two alternating supports and two free flights on all four real hooves: studio, interpolated orbit, bank, starting ramp and wrap',()=>{global.window=global;const T=global.THREE=require('../js/three.min');T.TextureLoader.prototype.load=()=>new T.Texture();require('../js/mould');require('../js/horse-rig');const D=CarrierMeshData(),f=CabinetFigurines(new T.Group())(2),m=f.mesh.children[0],p=m.geometry.attributes.position.array;
+ const ids=feet.map(f=>{const out=[];for(let j=0;j<D.pos.length;j+=3)if(Math.round(D.phase[j/3]*255/tau)===f.byte&&D.pos[j+1]<f.floor+.014)out.push(j);A.ok(out.length>=20);return out;});
+ for(const method of ['setPhase','move'])for(const bank of [0,-.095])for(const amp of [1,.42]){const N=192,frames=[];for(let i=0;i<=N;i++){f[method](i/N*tau,amp,false,bank);const co=Math.cos(bank),si=Math.sin(bank);frames.push(ids.map(js=>{let x=0,y=1;for(const j of js){x+=p[j];y=Math.min(y,m.position.y+co*p[j+1]-si*p[j+2]);}return [x/js.length,y,js.findIndex(j=>m.position.y+co*p[j+1]-si*p[j+2]<y+.000008),js.map(j=>p[j])];}));}const beat=[];for(let j=0;j<4;j++){const {name,offset}=feet[j];let max=0;for(let i=0;i<=N;i++){const t=i/N,u=(t+offset)%1,[x,y]=frames[i][j];if(u<=G.duty){near(y,.0015,.00045,name+' floats during load');if(u<=G.duty*.66)near(x+amp*u,frames[offset*N][j][0],.00008,name+' skids during flat support');if(i&&u>0){const pre=frames[i-1][j],contact=pre[2],slip=frames[i][j][3][contact]-pre[3][contact]+amp/N;near(slip,0,.00009,name+' contacting toe skids through heel-off');}}max=Math.max(y,max);}A.ok(max>.090*amp,name+' does not clear');near(frames[0][j][0],frames[N][j][0],1e-6);near(frames[0][j][1],frames[N][j][1],1e-6);}
+   for(let i=0;i<12;i++)beat.push(frames[i*N/12].map((v,k)=>v[1]<.0021?feet[k].name:'').filter(Boolean).join('+')||'air');A.deepEqual(beat,[...Array(5).fill('RH+LF'),'air',...Array(5).fill('LH+RF'),'air']);for(const i of [84,180])A.ok(frames[i].every(v=>v[1]>.0015+.012*amp));}
+ f.setPhase(0,0,false,0);for(const js of ids)near(m.position.y+Math.min(...js.map(j=>p[j+1])),.0015,.0007,'quiet stand');});
+
+test('separate stance spring, breakover and recovery: the fetlock sinks and rebounds before lift; the returning hoof clears early, flips and retracts',()=>{for(const front of [true,false]){const side=front?1:0,leg=u=>G.trot(u,front,side),world=(u,j)=>leg(u).points[j][1]+G.trunk(u),d=G.duty;A.ok(world(0,3)-world(d/2,3)>.014);A.ok(world(d*.88,3)-world(d/2,3)>.013);A.equal(leg(d*.64).pitch,0);A.ok(leg(d*.99).pitch<-.43);A.ok(leg(d+(1-d)*.78).pitch>.11);A.ok(world(d+(1-d)*.40,4)>world(d+(1-d)*.61,4));A.ok(leg(.97).points[4][0]>leg(0).points[4][0]+.01);}});
+
+// A signed bend on the *skin*, not the solver branch name or an unsigned
+// joint angle. The prior cast could put its hock above the high knee in
+// recovery even with correct segment lengths and four perfect hoof plants.
+test('both actual hind shanks slope down and back; stifle leads and hock folds the opposite way through support, swing and extension',()=>{
+ global.window=global;const T=global.THREE=require('../js/three.min');T.TextureLoader.prototype.load=()=>new T.Texture();require('../js/mould');require('../js/horse-rig');const {patches,read}=require('../tools/hind_marks.cjs'),groups=patches(CarrierMeshData()),f=CabinetFigurines(new T.Group())(4),m=f.mesh.children[0],p=m.geometry.attributes.position.array;
+ const bend=(a,b,c)=>{const X=b[0]-a[0],Y=b[1]-a[1],x=c[0]-b[0],y=c[1]-b[1];return Math.atan2(X*y-Y*x,X*x+Y*y)*180/Math.PI;},N=192;
+ for(const method of ['setPhase','move'])for(const walk of [false,true])for(const amp of [1,.42]){const phases=[[],[]];for(let i=0;i<N;i++){
+   f[method](i*tau/N,amp,walk,0);for(let side=0;side<2;side++){const [hip,knee,hock,fetlock]=groups[side].map(ids=>read(p,ids)),k=bend(hip,knee,hock),h=bend(knee,hock,fetlock);
+    A.ok(k<-25&&h>18,`wrong bend on ${method}/${walk}/${side}/${i}: ${k}, ${h}`);A.ok(knee[0]-hock[0]>.004&&knee[1]-hock[1]>.022,`hock in front of or level with the stifle on ${method}/${walk}/${side}/${i}`);
+    phases[side][(i+side*N/2)%N]={k:-k,h,x:knee[0],under:fetlock[0]-hock[0]};}}
+   if(amp===1)for(const a of phases){const at=u=>a[Math.round(u*N)%N],off=at(walk?.63:.40),reach=at(walk?.98:.96);
+    // The paired forefoot retimes the hind recovery. Require a sustained
+    // interval, not a convenient hand-picked photograph of the new stride.
+    A.ok(off.under<-.014);let span=0,best=0;for(let j=0;j<N;j++){const q=a[j],u=j/N,carrying=u>(walk?.64:.46)&&u<(walk?.94:.89)&&q.x>off.x+.045&&q.under>.03&&['k','h'].every(k=>q[k]>Math.max(off[k],reach[k])+22);span=carrying?span+1:0;best=Math.max(span,best);}A.ok(best>=Math.ceil((walk?.08:.10)*N),`No sustained unfolding below an advancing stifle: ${best} of ${N}`);}
+ }
+});

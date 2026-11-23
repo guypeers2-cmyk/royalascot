@@ -1,0 +1,5 @@
+Multiplayer changes for GitHub Desktop
+
+This archive contains only changed/new source files for the Ascot multiplayer + Vercel setup, preserving their paths relative to the repository root. It deliberately excludes .git, node_modules, local data/table.json, and environment secrets.
+
+To apply: extract, then copy the contents into a local clone of guypeers2-cmyk/royalascot, allowing replacement of matching files. Review all changes in GitHub Desktop before committing.
