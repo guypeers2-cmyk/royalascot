@@ -3,6 +3,8 @@
 #cabinet.console-stage:not(.station-full) #viewWindow{height:clamp(240px,calc(100dvh - var(--station-top,145px) - 9px),875px)}
 #cabinet.console-stage:not(.station-full)>.race-strip{display:none}
 #cabinet.console-stage .sat-case{height:100%;max-height:805px;width:min(1220px,100%)}
+#cabinet.console-stage.station-full .sat-case{max-height:100%;width:min(1520px,100%)}
+#cabinet.finish-stage.station-full #finishSlate .finish-shell{max-height:100%;width:min(1440px,100%)}
 #cabinet.console-stage .sat-view{padding-inline:clamp(3px,1.3vw,22px)}
 #cabinet.console-stage .feed-ident{margin-right:auto}.gate-audio-key{margin-left:auto;margin-right:6px;pointer-events:auto}#cabinet:not(.console-stage) .gate-audio-key{display:none}.gate-audio-key[aria-pressed=true]{color:#d6e4aa;border-color:#8eab80}
 #tubeScroll{display:grid;grid-template-rows:auto minmax(0,1fr);overflow:visible;min-height:0;outline-offset:-2px}

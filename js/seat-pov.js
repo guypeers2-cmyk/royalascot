@@ -32,22 +32,33 @@
    };
  }
  const SX=1.003,faceDefs={front:[[2,0,0],[0,2,0],[0,0,1]],left:[[0,0,2],[0,2,0],[-1,0,0]],right:[[0,0,-2],[0,2,0],[1,0,0]],up:[[2,0,0],[0,0,2],[0,-1,0]],down:[[2,0,0],[0,0,-2],[0,1,0]]};
- function create(view,reduced){const motion=head(reduced);let stage=null,plate=null,ctx=null,faces=[],fr=null,px=1,last='',mode='',exposure=null;
+ function create(view,reduced){const motion=head(reduced);let stage=null,plate=null,ctx=null,faces=[],fr=null,px=1,last='',mode='',exposure=null,sF=null,sCx=null,sCy=null,lastW=0,lastH=0,zoomTarget=1,zoomSmooth=1;
    function init(){if(stage)return;stage=document.createElement('div');stage.id='seatStage';stage.setAttribute('aria-hidden','true');view.prepend(stage);
      for(const [key,[U,V,n]] of Object.entries(faceDefs)){const size=768,u=U.map(k=>k*SX/size),v=V.map(k=>k*SX/size),o=n.map((k,i)=>k-(U[i]+V[i])*SX/2);const im=new Image();im.alt='';im.draggable=false;im.width=im.height=size;const file='seat-'+key+'.webp';im.src=root.ASCOT_ASSETS?.[file]||'assets/'+file;stage.append(im);faces.push({el:im,p:{u,v,o}});}
      plate=document.createElement('canvas');plate.className='seat-film';plate.style.width=stockW+'px';plate.style.height=H+'px';stage.append(plate);ctx=plate.getContext('2d');}
-   function enable(on){view.classList.toggle('seat-pov',on);if(on)init();if(stage)stage.hidden=!on;if(!on){motion.reset();fr=null;exposure=null;last='';}}
+   function enable(on){view.classList.toggle('seat-pov',on);if(on)init();if(stage)stage.hidden=!on;if(!on){motion.reset();fr=null;exposure=null;sF=sCx=sCy=null;lastW=lastH=0;zoomTarget=zoomSmooth=1;last='';}}
+   function zoom(f){zoomTarget=limit(zoomTarget*f,.75,2.2);}
+   function resetZoom(){zoomTarget=1;}
    function aim(w,h,dpr,dt,targets,phase,pin,cap=2,box=null,ink=null){const wanted=phase==='race'?fieldAim(targets):phase==='gates'?angles(root.AscotCourse.photo(0,.5).x,385):{yaw:0,pitch:10*RAD},a=motion.tick(dt,wanted,phase==='race'||phase==='gates');fr=frame(a.yaw,a.pitch,w,h);
      const m=phase!=='race'?'station':motion.free?'free':pin?'runner-'+pin:'field';if(mode!==m){stage.dataset.gaze=mode=m;}
      if((m==='field'||m.startsWith('runner-'))&&!motion.manual){const a=box??{l:0,t:0,r:w,b:h},aw=a.r-a.l,ah=a.b-a.t;
        // Offset the optical centre, not the picture separately from its
        // clickable plane. All six teams stay inside the actual clear glass.
        fr.f=1;fr.cx=fr.cy=0;const b=m==='field'||!ink?{l:-18,r:1212,t:253,b:462}:ink,ps=[];for(const x of [b.l,b.r])for(const y of [b.t,b.b]){const p=screenPoint(fr,x,y);if(p)ps.push(p);}if(ps.length===4){const xs=ps.map(p=>p.x),ys=ps.map(p=>p.y),L=Math.min(...xs),R=Math.max(...xs),T=Math.min(...ys),B=Math.max(...ys),pad=Math.min(6,.03*aw,.04*ah);fr.f=Math.max(.1,Math.min((aw-2*pad)/(R-L),(ah-2*pad)/(B-T),aw*.77,ah*2.2));const k=fr.f;fr.cx=limit((a.l+a.r-k*(R+L)*.68)/2,a.l+pad-L*k,a.r-pad-R*k);fr.cy=limit((a.t+a.b-k*(B+T)*.68)/2,a.t+pad-T*k,a.b-pad-B*k);}else fr=frame(0,0,w,h);exposure=[fr.f/w,(fr.cx??w/2)/w,(fr.cy??h/2)/h];
-     }else if(phase==='race'&&motion.manual&&exposure){fr.f=w*exposure[0];fr.cx=w*exposure[1];fr.cy=h*exposure[2];}const key=[a.yaw,a.pitch,w,h,fr.f,fr.cx,fr.cy].join('/');if(last!==key){last=key;for(const face of faces)face.el.style.transform=cssMatrix(coefficients(fr,face.p));plate.style.transform=cssMatrix(coefficients(fr,overscan));}
+     }else if(phase==='race'&&motion.manual&&exposure){fr.f=w*exposure[0];fr.cx=w*exposure[1];fr.cy=h*exposure[2];}
+     const stepDt=limit(dt,0,.13),zEase=1-Math.exp(-stepDt*14);
+     zoomSmooth=Math.abs(zoomTarget-zoomSmooth)<.001?zoomTarget:zoomSmooth+(zoomTarget-zoomSmooth)*zEase;
+     const tf0=fr.f,tcx0=fr.cx??w*.5,tcy0=fr.cy??h*.5;
+     const bx=box?(box.l+box.r)*.5:w*.5,by=box?(box.t+box.b)*.5:h*.5;
+     const tf=tf0*zoomSmooth,tcx=zoomSmooth===1?tcx0:bx+zoomSmooth*(tcx0-bx),tcy=zoomSmooth===1?tcy0:by+zoomSmooth*(tcy0-by);
+     if(sF==null||lastW!==w||lastH!==h){sF=tf;sCx=tcx;sCy=tcy;lastW=w;lastH=h;}
+     else{const fEase=1-Math.exp(-stepDt*16);sF=Math.abs(tf-sF)<.005?tf:sF+(tf-sF)*fEase;sCx=Math.abs(tcx-sCx)<.02?tcx:sCx+(tcx-sCx)*fEase;sCy=Math.abs(tcy-sCy)<.02?tcy:sCy+(tcy-sCy)*fEase;}
+     fr.f=sF;fr.cx=sCx;fr.cy=sCy;
+     const key=[a.yaw,a.pitch,w,h,fr.f,fr.cx,fr.cy].join('/');if(last!==key){last=key;for(const face of faces)face.el.style.transform=cssMatrix(coefficients(fr,face.p));plate.style.transform=cssMatrix(coefficients(fr,overscan));}
      // The projected texture must not change the CSS viewport or its hit box.
      const next=limit(fr.f*dpr/F,Math.min(.75,cap*.68),cap);const pw=Math.round(stockW*next),ph=Math.round(H*next);if(plate.width!==pw||plate.height!==ph){plate.width=pw;plate.height=ph;}px=plate.width/stockW;ctx.setTransform(px,0,0,plate.height/H,px*gutter,0);ctx.clearRect(-gutter,0,stockW,H);return ctx;
    }
-   return {enable,aim,motion,get magnification(){return fr?fr.f/F:1;},get ready(){return faces.every(f=>f.el.complete&&f.el.naturalWidth>0);},project:(x,y)=>fr?screenPoint(fr,x,y):null,hit:(x,y)=>fr?pick(fr,x,y):null,drag:(dx,dy)=>motion.drag(dx,dy,fr?.f||500)};
+   return {enable,aim,motion,zoom,resetZoom,get magnification(){return fr?fr.f/F:1;},get ready(){return faces.every(f=>f.el.complete&&f.el.naturalWidth>0);},project:(x,y)=>fr?screenPoint(fr,x,y):null,hit:(x,y)=>fr?pick(fr,x,y):null,drag:(dx,dy)=>motion.drag(dx,dy,fr?.f||500)};
  }
  const api={W,H,F,ZOOM,gutter,stockW,overscan,film,angles,basis,frame,coefficients,cssMatrix,screenPoint,pick,fieldAim,head,create};root.SeatPOV=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(globalThis);

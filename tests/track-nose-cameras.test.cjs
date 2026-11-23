@@ -104,6 +104,7 @@ test('track overview is tilted lower, foldable players menu sits bottom-left, an
   assert.ok(mpSrc.includes('name="pin"'), 'login gate supports personal PIN');
   assert.ok(mpSrc.includes('playersPinnedOpen') && mpSrc.includes('syncPlayersMenuOpen'), 'keeps active players menu open by default');
   assert.ok(mpSrc.includes('playerBetsTip') && mpSrc.includes('mouseover'), 'shows hovered player bets on mouseover');
+  assert.ok(mpSrc.includes("command('ready')") && mpSrc.includes('syncReadyButtons'), 'uses Ready button instead of unilateral Start race');
   const receiptSrc = read('js/race-receipt.js');
   assert.ok(receiptSrc.includes('players-results') && receiptSrc.includes('playerResults'), 'renders other players results in result panel');
 
@@ -140,4 +141,30 @@ test('startup flow chooses Mobile / Tablet / Desktop, then Username / PIN login,
   assert.ok(serveSrc.includes('pin:data.pin'), 'serve.mjs forwards pin on /api/join');
   const apiJoinSrc = read('api/join.js');
   assert.ok(apiJoinSrc.includes('pin:data.pin'), 'api/join.js forwards pin on /api/join');
+});
+
+test('race monitor shows FIT left of STA and all cameras (0-8) have smooth damping, zoom, and fullscreen scaling', () => {
+  const html = read('index.html');
+  assert.ok(html.includes('<span>FIT · STA · Sprint</span>'), 'race monitor legend shows FIT left of STA');
+
+  const trackJs = read('js/track-tickets.js');
+  assert.ok(trackJs.includes('data-stat="fitness"') && trackJs.indexOf('data-stat="fitness"') < trackJs.indexOf('data-stat="energy"'), 'rail row puts fitness span left of STA em');
+
+  const trackCss = read('assets/trackside.css');
+  assert.ok(trackCss.includes('.rail-fit'), 'trackside.css styles .rail-fit');
+
+  const seatSrc = read('js/seat-pov.js');
+  assert.ok(seatSrc.includes('zoomSmooth') && seatSrc.includes('sF') && seatSrc.includes('sCx'), 'seat-pov smoothly damps focal length and zoom');
+
+  const orbitSrc = read('js/orbit.js');
+  assert.ok(orbitSrc.includes('autoDist') && orbitSrc.includes('sNoseYaw') && orbitSrc.includes('noseBlend') && orbitSrc.includes('winnerBlend'), 'orbit.js syncs autoDist and smoothly blends nose/chase/winner cameras');
+
+  const sceneSrc = read('js/scene.js');
+  assert.ok(sceneSrc.includes('zoom2dGoal') && sceneSrc.includes('sizeObserver') && sceneSrc.includes('reduce?45:0'), 'scene.js unlocks 60fps 2D rendering, observes orbit canvas, and supports 2D zoom');
+
+  const appSrc = read('js/app.js');
+  assert.ok(appSrc.includes('n!==3&&n!==7&&n!==8') && appSrc.includes('requestAnimationFrame(()=>scene.size())'), 'app.js enables zoom controls on Cam 8 and resizes after fullscreen transitions');
+
+  const consoleCss = read('assets/console.css');
+  assert.ok(consoleCss.includes('#cabinet.console-stage.station-full .sat-case'), 'console.css expands console case in fullscreen');
 });
