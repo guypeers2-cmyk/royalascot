@@ -73,6 +73,31 @@ Rules now enforced on the phone sheet: no text below 12 px, serif never below
 tabular-nums`, line-height ≥ 1.15 wherever a value can wrap, 44 px minimum for
 anything you tap.
 
+## 3b. Pinned to 40 % of the handset height
+
+The sheet no longer grows freely: on a portrait phone it is capped at **two
+fifths of the viewport** and scrolls inside itself.
+
+```css
+html[data-device=mobile] #cabinet.docked-rail #railBay #livePanel{max-height:calc((40dvh - 2px)/var(--rail-zoom,1.1))}
+```
+
+The division matters — the sheet's `max-height` lives inside its own `zoom:
+1.10`, so an undivided `40dvh` renders as 44 % of the screen. Measured after the
+fix:
+
+| handset | sheet | of screen | race image |
+|---|---|---|---|
+| 320 × 568 | 225 px | 39.6 % | 292 px |
+| 360 × 780 | 310 px | 39.7 % | 425 px |
+| 390 × 844 | 336 px | 39.8 % | 463 px |
+| 430 × 932 | 371 px | 39.8 % | 516 px |
+
+Landscape is untouched — there the sheet docks to the side and takes width, so
+`40dvh` would leave it 156 px tall; the rule is portrait-only. Inside the two
+fifths, an empty ticket book also sheds its "no tickets on this race" line (the
+header already carries `0 slips`), which buys the monitor one more runner.
+
 ## 4. The trade-off to sign off
 
 The sheet is docked, so its extra 180 px comes out of the race image: the track

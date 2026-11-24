@@ -335,7 +335,7 @@
    that named those columns at 9 px is gone; the labels now travel with their
    own numbers (FIT 73 · STA 26%), which is both smaller and clearer. */
 @media (max-width:640px){
- html[data-device="mobile"] #cabinet #livePanel{zoom:1.1}
+ html[data-device="mobile"] #cabinet #livePanel{zoom:1.1;--rail-zoom:1.1}
  html[data-device="mobile"] #cabinet #livePanel header>small{font-size:.74rem}
  html[data-device="mobile"] #cabinet #livePanel .track-count{font-size:.74rem}
  html[data-device="mobile"] #cabinet #livePanel .rail-lap{font-size:.74rem}
@@ -378,6 +378,22 @@
  html[data-device="mobile"] #cabinet #livePanel #railBoard{--rail-cols:1.26rem 1.45rem minmax(0,1fr) auto auto}
  html[data-device="mobile"] #cabinet #livePanel #railBoard .rail-fit:before,html[data-device="mobile"] #cabinet #livePanel #railBoard li>em:before{font-size:.64rem}
 }
+/* Inside those two fifths every row counts: an empty ticket book sheds its
+   "no tickets" line (the header already says 0 slips) so the monitor keeps
+   the room. */
+html[data-device=mobile] #cabinet #livePanel #trackTickets:not(:has(.track-slip)) :is(.rail-empty,#trackPaper){display:none}
+
+/* Two fifths of the handset. The sheet keeps its 1.10 scale but stops
+   growing: on a 390 x 844 phone it is pinned to 40 dvh and scrolls inside
+   itself, so the race image always keeps the other three fifths. */
+@media (max-width:640px) and (orientation:portrait){
+ html[data-device="mobile"] #cabinet.docked-rail #railBay{padding:1px 3px}
+ /* 40 dvh is a screen measure; the sheet's max-height lives inside its own
+    1.10 zoom, so the two fifths are divided by that factor. */
+ html[data-device=mobile] #cabinet.docked-rail #railBay #livePanel,
+ html[data-device=mobile] #cabinet #viewWindow #livePanel{max-height:calc((40dvh - 2px)/var(--rail-zoom,1.1))}
+}
+
 /* Ticket slips and the fold's saddlecloths grow with the sheet. */
 html[data-device="mobile"] #cabinet #livePanel .track-slip{font-size:.82rem;min-height:34px;padding:3px 2px}
 html[data-device="mobile"] #cabinet #livePanel #trackPaper .cloth{font-size:1rem}
