@@ -70,6 +70,10 @@ export function createTableHandler(ctx, env) {
   }
 
   function saveSnapshot(dbPayload, now = Date.now()) {
+    const codeToSave = typeof dbPayload?.joinCode === 'string' && dbPayload.joinCode.trim()
+      ? dbPayload.joinCode.trim().toUpperCase()
+      : activeJoinCode;
+    activeJoinCode = codeToSave;
     sql.exec(
       'UPDATE ascot_shared_table SET join_code = ?, updated_ms = ?, payload = ? WHERE id = 1',
       activeJoinCode,
@@ -102,8 +106,9 @@ export function createTableHandler(ctx, env) {
       console.log(`TABLE JOIN CODE: ${activeJoinCode}`);
     } else {
       const row = rows[0];
-      activeJoinCode = configured || String(row.join_code || '').trim().toUpperCase() || generateJoinCode();
       persisted = typeof row.payload === 'string' ? JSON.parse(row.payload) : row.payload;
+      const persistedJoin = typeof persisted?.joinCode === 'string' ? persisted.joinCode.trim().toUpperCase() : '';
+      activeJoinCode = persistedJoin || configured || String(row.join_code || '').trim().toUpperCase() || generateJoinCode();
       if (activeJoinCode !== row.join_code) {
         sql.exec('UPDATE ascot_shared_table SET join_code = ? WHERE id = 1', activeJoinCode);
       }
@@ -118,6 +123,8 @@ export function createTableHandler(ctx, env) {
       joinCode: activeJoinCode,
       initialDb: persisted,
       autoTick: false,
+      adminUser: typeof env?.ASCOT_ADMIN_USER === 'string' ? env.ASCOT_ADMIN_USER : '',
+      adminPassword: typeof env?.ASCOT_ADMIN_PASSWORD === 'string' ? env.ASCOT_ADMIN_PASSWORD : '',
       onPersist: next => {
         if (initialized) saveSnapshot(next, Date.now());
       }
@@ -221,9 +228,72 @@ export function createTableHandler(ctx, env) {
         return json({ ok: true });
       }
 
+      if (url.pathname === '/api/admin' || url.pathname.startsWith('/api/admin/')) {
+        const op = url.pathname === '/api/admin'
+          ? (url.searchParams.get('op') || '')
+          : url.pathname.slice('/api/admin/'.length);
+
+        if (op === 'status') {
+          if (request.method !== 'GET') return methodNotAllowed('GET');
+          return json({ table: 'Royal Ascot · Shared Table', ...activeRoom.adminStatus() });
+        }
+        if (op === 'setup') {
+          if (request.method !== 'POST') return methodNotAllowed('POST');
+          const data = await parseJsonBody(request);
+          const out = activeRoom.adminSetup(data);
+          saveSnapshot(activeRoom.exportDb(), now);
+          return json(out);
+        }
+        if (op === 'login') {
+          if (request.method !== 'POST') return methodNotAllowed('POST');
+          const data = await parseJsonBody(request);
+          const out = activeRoom.adminLogin(data);
+          saveSnapshot(activeRoom.exportDb(), now);
+          return json(out);
+        }
+        if (op === 'logout') {
+          if (request.method !== 'POST') return methodNotAllowed('POST');
+          const token = bearer(request);
+          if (token && activeRoom.adminLogout(token)) {
+            saveSnapshot(activeRoom.exportDb(), now);
+          }
+          return json({ ok: true });
+        }
+        if (op === 'overview') {
+          if (request.method !== 'GET') return methodNotAllowed('GET');
+          const snap = activeRoom.adminSnapshot(bearer(request));
+          if (!snap) return json({ error: 'Administrator session expired or unauthorized.' }, 401);
+          return json(snap);
+        }
+        if (op === 'reset') {
+          if (request.method !== 'POST') return methodNotAllowed('POST');
+          const token = bearer(request);
+          if (!activeRoom.adminAuth(token)) {
+            return json({ error: 'Administrator session expired or unauthorized.' }, 401);
+          }
+          const data = await parseJsonBody(request);
+          const out = activeRoom.adminResetServer(token, data);
+          saveSnapshot(activeRoom.exportDb(), now);
+          return json(out);
+        }
+        if (op === 'action') {
+          if (request.method !== 'POST') return methodNotAllowed('POST');
+          const token = bearer(request);
+          if (!activeRoom.adminAuth(token)) {
+            return json({ error: 'Administrator session expired or unauthorized.' }, 401);
+          }
+          const data = await parseJsonBody(request);
+          const out = activeRoom.adminAction(token, data.action, data.data || {});
+          saveSnapshot(activeRoom.exportDb(), now);
+          return json(out);
+        }
+        return json({ error: 'Unknown administrator endpoint.' }, 404);
+      }
+
       return json({ error: 'No such table endpoint.' }, 404);
     } catch (error) {
-      return json({ error: error?.message || 'The table could not complete that request.' }, 400);
+      const msg = error?.message || 'The table could not complete that request.';
+      return json({ error: msg }, /already been claimed|environment variables/i.test(msg) ? 403 : 400);
     }
   }
 

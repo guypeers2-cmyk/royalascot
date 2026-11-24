@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Royal Ascot · Administrator Console</title>
+<link rel="stylesheet" href="/assets/admin.css">
+</head>
+<body>
+<div class="admin-shell">
+  <header class="admin-topbar">
+    <div class="brand">
+      <span class="crest">RA</span>
+      <div>
+        <h1>Royal Ascot · Administrator Console</h1>
+        <p id="topSubtitle">Restricted Server Management &amp; Permanent History Archive</p>
+      </div>
+    </div>
+    <div class="top-actions">
+      <a class="btn ghost" href="/">Open Track</a>
+      <button id="refreshBtn" class="btn ghost" type="button" hidden>Refresh</button>
+      <label id="autoRefreshWrap" class="toggle-chip" hidden>
+        <input id="autoRefresh" type="checkbox" checked>
+        <span>Live 4s</span>
+      </label>
+      <button id="logoutBtn" class="btn danger-outline" type="button" hidden>Sign Out</button>
+    </div>
+  </header>
+
+  <main id="authView" class="auth-wrap">
+    <section class="card auth-card">
+      <div class="auth-badge" id="authBadge">Checking server status…</div>
+      <h2 id="authTitle">Administrator Access</h2>
+      <p id="authDesc" class="muted">Loading administrator lock status…</p>
+      <form id="authForm" class="stack" autocomplete="on">
+        <label class="field">
+          <span>Administrator Username</span>
+          <input id="authUser" name="username" type="text" minlength="3" maxlength="24" required autocomplete="username" placeholder="e.g. admin">
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input id="authPass" name="password" type="password" minlength="6" maxlength="128" required autocomplete="current-password" placeholder="Enter administrator password">
+        </label>
+        <label id="authConfirmWrap" class="field" hidden>
+          <span>Confirm Password</span>
+          <input id="authConfirm" name="confirm" type="password" minlength="6" maxlength="128" autocomplete="new-password" placeholder="Re-enter password">
+        </label>
+        <p id="authError" class="err" role="alert" hidden></p>
+        <button id="authSubmit" class="btn primary" type="submit">Sign In</button>
+      </form>
+    </section>
+  </main>
+
+  <main id="dashView" class="dash" hidden>
+    <section class="kpi-grid" aria-label="All-time metrics">
+      <article class="kpi-card">
+        <span>Active Session / Race</span>
+        <strong id="kpiSession">S1 · Race #1</strong>
+        <em id="kpiPhase">betting</em>
+      </article>
+      <article class="kpi-card">
+        <span>Archived Races (All-Time)</span>
+        <strong id="kpiRaces">0</strong>
+        <em id="kpiResets">0 server resets</em>
+      </article>
+      <article class="kpi-card">
+        <span>All-Time Wagered</span>
+        <strong id="kpiWagered">0m</strong>
+        <em id="kpiReturned">0m paid out</em>
+      </article>
+      <article class="kpi-card">
+        <span>Registered Players</span>
+        <strong id="kpiPlayers">0</strong>
+        <em id="kpiOnline">0 online now</em>
+      </article>
+    </section>
+
+    <div class="grid-two">
+      <section class="card danger-zone">
+        <header class="card-head">
+          <div>
+            <h2>Server Reset &amp; History Archival</h2>
+            <p class="muted">Every reset automatically saves a complete snapshot to permanent history before resetting.</p>
+          </div>
+          <span class="pill gold" id="joinCodePill">Code: —</span>
+        </header>
+        <div class="stack">
+          <label class="field">
+            <span>Reset Mode</span>
+            <select id="resetMode">
+              <option value="archive_reset_wallets">Archive All History &amp; Reset Table (Keep Players @ 500m)</option>
+              <option value="archive_wipe_players">Archive All History &amp; Full Clean Wipe (Remove All Players)</option>
+              <option value="soft_round">Soft Round Reset (Refund Open Bets &amp; Restart Current Clock)</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Reset Note / Reason (saved in archive)</span>
+            <input id="resetReason" type="text" maxlength="140" placeholder="Optional note, e.g. End of Friday tournament">
+          </label>
+          <div id="resetArmRow" class="row-actions">
+            <button id="resetArmBtn" class="btn danger" type="button">Reset Server…</button>
+          </div>
+          <div id="resetConfirmBox" class="confirm-box" hidden>
+            <p id="resetConfirmText">Confirm resetting the live server? All history will be preserved in the permanent archive.</p>
+            <div class="row-actions">
+              <button id="resetConfirmBtn" class="btn danger" type="button">Confirm Reset Now</button>
+              <button id="resetCancelBtn" class="btn ghost" type="button">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <header class="card-head">
+          <div>
+            <h2>Live Table Controls</h2>
+            <p class="muted" id="liveRaceMeta">Waiting for live status…</p>
+          </div>
+        </header>
+        <div class="stack">
+          <div class="row-actions">
+            <button id="forceCloseBtn" class="btn primary" type="button">Force Start Race</button>
+            <button id="forceNextBtn" class="btn primary" type="button">Advance Next Race</button>
+          </div>
+          <form id="joinCodeForm" class="inline-form">
+            <label class="field grow">
+              <span>Table Join Code (4–12 chars)</span>
+              <input id="joinCodeInput" type="text" minlength="4" maxlength="12" pattern="[A-Za-z0-9]{4,12}" required>
+            </label>
+            <button class="btn ghost" type="submit">Update Code</button>
+          </form>
+          <p id="dashBanner" class="banner" hidden></p>
+        </div>
+      </section>
+    </div>
+
+    <section class="card">
+      <header class="card-head">
+        <div>
+          <h2>Player Seats &amp; Balances</h2>
+          <p class="muted">Manage active and saved player wallets.</p>
+        </div>
+      </header>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Status</th>
+              <th>PIN</th>
+              <th>Balance</th>
+              <th>Open Bets</th>
+              <th>Races</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="playersBody">
+            <tr><td colspan="7" class="muted">No players registered yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <header class="card-head wrap-head">
+        <div>
+          <h2>Permanent Saved History Archive</h2>
+          <p class="muted">Stored permanently on the server across all resets and restarts.</p>
+        </div>
+        <div class="row-actions">
+          <button id="exportJsonBtn" class="btn ghost" type="button">Export JSON</button>
+          <button id="exportCsvBtn" class="btn ghost" type="button">Export CSV</button>
+        </div>
+      </header>
+
+      <div class="archive-controls">
+        <div class="tabs" role="tablist">
+          <button class="tab active" data-tab="races" type="button">All Races (<span id="tabRacesCount">0</span>)</button>
+          <button class="tab" data-tab="resets" type="button">Reset Snapshots (<span id="tabResetsCount">0</span>)</button>
+          <button class="tab" data-tab="audit" type="button">Audit Log (<span id="tabAuditCount">0</span>)</button>
+          <button class="tab" data-tab="security" type="button">Admin Security</button>
+        </div>
+        <input id="historyFilter" class="search-input" type="search" placeholder="Filter races by session, horse, or player…">
+      </div>
+
+      <div id="tabRaces" class="tab-panel">
+        <div id="racesList" class="archive-list"></div>
+      </div>
+      <div id="tabResets" class="tab-panel" hidden>
+        <div id="resetsList" class="archive-list"></div>
+      </div>
+      <div id="tabAudit" class="tab-panel" hidden>
+        <div id="auditList" class="archive-list"></div>
+      </div>
+      <div id="tabSecurity" class="tab-panel" hidden>
+        <form id="credsForm" class="stack narrow">
+          <p id="envLockNote" class="muted" hidden>Administrator credentials are managed via server environment variables (<code>ASCOT_ADMIN_USER</code> / <code>ASCOT_ADMIN_PASSWORD</code>) and cannot be edited here.</p>
+          <label class="field">
+            <span>Current Password</span>
+            <input id="secCurPass" type="password" required autocomplete="current-password">
+          </label>
+          <label class="field">
+            <span>New Username</span>
+            <input id="secNewUser" type="text" minlength="3" maxlength="24" required autocomplete="username">
+          </label>
+          <label class="field">
+            <span>New Password</span>
+            <input id="secNewPass" type="password" minlength="6" maxlength="128" required autocomplete="new-password">
+          </label>
+          <button id="secSaveBtn" class="btn primary" type="submit">Update Credentials</button>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>
+<script src="/js/admin.js"></script>
+</body>
+</html>
