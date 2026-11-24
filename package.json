@@ -1,19 +1,18 @@
 {
-  "name": "hippodrome-royal-ascot",
+  "name": "royal-ascot-cloudflare",
   "version": "1.0.0",
   "private": true,
-  "description": "A self-contained mechanical medal derby at a casino player station.",
-  "dependencies": {
-    "postgres": "^3.4.7"
+  "description": "Royal Ascot · Harness Trot — static cabinet plus an authoritative shared table on Cloudflare Workers and one Durable Object.",
+  "engines": {
+    "node": ">=22.12"
   },
   "scripts": {
-    "start": "node serve.mjs",
-    "test": "node --test tests/",
-    "balance": "node tools/check_balance.cjs",
-    "pace": "node tools/pace_audit.cjs",
-    "smoke": "node --test tests/room.test.cjs tests/worker-table.test.cjs"
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "dry-run": "wrangler deploy --dry-run --outdir=.dist"
   },
-  "engines": {
-    "node": ">=18"
+  "devDependencies": {
+    "wrangler": "^4.167.0"
   }
 }

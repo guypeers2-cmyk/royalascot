@@ -1,0 +1,182 @@
+/* PIXEL CONSOLE — one pixel face for every word on the betting glass, and a
+   compact rack for narrow cabinets.
+
+   Why a pixel face here at all: the glass is a machine face, read at arm's
+   length while the race runs, and it carries a lot of small type (odds, win
+   chances, FIT/STA ratings, stake denominations). VT323 is drawn on a 16 px
+   grid with a tall x-height and narrow advance, so it stays legible down to
+   ~12 px and takes roughly 15 % less width than the humanist sans — which is
+   exactly the room the compact rack needs. Silkscreen is shipped alongside for
+   the small uppercase labels if a blockier register is wanted: swap
+   --pixel-caps to --pixel-terminal on a single line below.
+
+   Both faces are OFL 1.1 (Google Fonts, /assets/pixel/). */
+
+@font-face{font-family:PixelTerm;src:url('pixel/VT323.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap;
+ unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:PixelCaps;src:url('pixel/Silkscreen-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap;
+ unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:PixelCaps;src:url('pixel/Silkscreen-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap;
+ unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+#roundConsole{
+ --pixel-terminal:'PixelTerm',ui-monospace,SFMono-Regular,Menlo,monospace;
+ --pixel-caps:'PixelCaps',ui-monospace,monospace;
+ --pixel:var(--pixel-terminal);
+ /* re-point the house tokens: every rule inside the glass that asked for the
+    serif, the sans or the mono now gets the pixel face */
+ --serif:var(--pixel);--sans:var(--pixel);--mono:var(--pixel);
+ font-family:var(--pixel);font-synthesis-weight:none;-webkit-font-smoothing:antialiased;
+ letter-spacing:.012em;font-variant-ligatures:none}
+#roundConsole :is(h1,h2,h3,h4,p,span,small,strong,b,em,i,abbr,button,select,label,div,header,footer,aside,section,li,td,th){
+ font-family:var(--pixel)}
+/* Uppercase registers — the machine's own lettering — take the blockier face. */
+#roundConsole :is(.race-id small,.stake-caption #quickStakeHint,.field-columns,.cash-kicker,.register-title small,.sat-casting,.deck-id,.chance-key){
+ font-family:var(--pixel-caps);letter-spacing:.02em}
+/* Pixel faces have no bold: let size and ink do the work instead of a smeared
+   synthetic weight. */
+#roundConsole :is(b,strong,.quoted,.stat-number){font-synthesis-weight:none;font-weight:400}
+
+/* ---- type scale: small enough to be compact, large enough to read ---------- */
+#roundConsole .race-id small,#roundConsole[data-glass] #glassStatus .race-id>small{font-size:12.5px}
+#roundConsole .race-id h2{font-size:17px;letter-spacing:.01em}
+#roundConsole .glass-money span{font-size:13px}
+#roundConsole .glass-money b{font-size:16px}
+#roundConsole .glass-clock small{font-size:12px}
+#roundConsole .glass-clock strong{font-size:18px}
+#roundConsole .stake-caption b{font-size:14px}
+#roundConsole .stake-caption #quickStakeHint{font-size:11px}
+#roundConsole #tubeField .tube-coins button{font-size:15px}
+#roundConsole .register-title h3{font-size:16px;letter-spacing:.02em}
+#roundConsole .register-title small{font-size:11.5px}
+#roundConsole #tubeField .field-markets button{font-size:13px}
+#roundConsole .field-columns{font-size:11px}
+#roundConsole #tubeRows .field-entry{font-size:14px}
+#roundConsole #tubeRows :is(.entry-id b,.entry-id strong){font-size:15px}
+#roundConsole #tubeRows .entry-style{font-size:12px}
+#roundConsole #tubeRows .entry-chance strong{font-size:15px}
+#roundConsole #tubeRows .entry-chance small{font-size:10px}
+#roundConsole #tubeRows .entry-prices small{font-size:11px}
+#roundConsole #tubeRows .entry-prices em{font-size:14px}
+#roundConsole #tubeRows .entry-record{font-size:11px}
+#roundConsole #tubeRows .mini-stats small{font-size:10px}
+#roundConsole #tubeRows .mini-stats b{font-size:13px}
+#roundConsole #cashBook :is(h3,b,strong){font-size:14px}
+#roundConsole #cashBook .cash-kicker,#roundConsole #cashBook footer{font-size:11px}
+#roundConsole #cashBook #cashEntries{font-size:12px}
+#roundConsole .field-foot{font-size:12px}
+#roundConsole #paddockReport{font-size:12px}
+#roundConsole .screen-slip{font-size:13px}
+#roundConsole .screen-slip .tube-prices>span{font-size:12px}
+#roundConsole .slip-who :is(small,strong,b){font-size:13px}
+#roundConsole .tube-prices span{font-size:12px}
+#roundConsole .tube-prices b{font-size:15px}
+#roundConsole .sat-deck button{font-size:14px}
+#roundConsole .sat-deck .deck-id{font-size:10px}
+#roundConsole .sat-casting{font-size:10px}
+
+/* ---- the compact rack: phones and narrow cabinets -------------------------
+   The glass already has a "ribbon" rail on narrow cabinets: the stake caption,
+   the six denominations and the three markets share one upper strip. At 390 px
+   that strip leaves the denominations 19 px for six keys, so the ribbon is
+   unwound here into three short rows and every block is trimmed. */
+@media (max-width:760px){
+ #roundConsole .sat-casting{display:none}
+ /* Vertical stack, top to bottom: glass, then the four keys. The narrow glass
+    inherits a three-row grid whose spare row ends up under the keys, which is
+    what left a tall empty pane; a flex column cannot drift like that. */
+ #roundConsole .sat-case{display:flex;flex-direction:column;height:100%;padding:2px 4px 4px;gap:0}
+ #roundConsole .sat-bezel{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+ #roundConsole .sat-glass{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+ #roundConsole #tubeScroll{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;grid-template-rows:none;overflow:hidden}
+ #roundConsole #glassStatus{flex:0 0 auto}
+ #roundConsole #tubeField{flex:1 1 auto;min-height:0}
+ #roundConsole #tubeScroll .screen-slip{flex:0 0 auto}
+ #roundConsole .sat-deck{flex:0 0 auto}
+ /* the field keeps a growable middle: mast, the six rows, then the hint */
+ #roundConsole #tubeField .field-spread{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;gap:0}
+ #roundConsole #starterSheet{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+ #roundConsole #tubeField #tubeRows{display:flex;flex-direction:column;gap:2px;flex:1 1 auto;min-height:0;overflow:auto;padding:0;align-content:flex-start}
+ #roundConsole .sat-bezel{border-width:2px;padding:1px}
+ #roundConsole .sat-glass{padding:2px}
+ #roundConsole .sat-case{max-height:100%}
+
+ /* the field becomes one column: denominations, markets, the six runners */
+ #roundConsole #tubeField,#roundConsole #tubeField[data-ribbon=true]{display:flex;flex-direction:column;gap:0;padding:0 6px;min-height:0}
+ #roundConsole #tubeField .stake-bank,#roundConsole #tubeField[data-ribbon=true] .stake-bank{
+  display:flex;align-items:baseline;justify-content:flex-start;gap:7px;grid-area:auto;width:100%;
+  padding:4px 0;border:0;border-bottom:1px solid #57758366}
+ #roundConsole .stake-caption{display:flex;flex:0 0 auto;align-items:baseline;gap:4px;white-space:nowrap;min-width:max-content}
+ #roundConsole .stake-caption #quickStakeHint{display:none}
+ #roundConsole #tubeField .tube-coins{width:auto;flex:1 1 0;gap:4px;min-width:0}
+ #roundConsole #tubeField .tube-coins button{min-height:30px;border-radius:3px}
+
+ /* status: race line, money and clock on one short strip */
+ #roundConsole #glassStatus,#roundConsole[data-glass=field] #glassStatus{display:flex;flex-wrap:nowrap;align-items:baseline;gap:8px;padding:3px 7px;min-height:0}
+ #roundConsole[data-glass] #glassStatus .race-id{display:flex;align-items:baseline;gap:5px;min-width:0;flex:1 1 auto}
+ #roundConsole[data-glass] #glassStatus .race-id h2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0;font-size:16px;line-height:1.1}
+ #roundConsole[data-glass] #glassStatus .race-id>small{white-space:nowrap;font-size:11px}
+ #roundConsole[data-glass] #glassStatus .glass-money,#roundConsole[data-glass] #glassStatus .glass-clock{display:flex;flex:none;align-items:baseline;gap:5px}
+ #roundConsole[data-glass] #glassStatus .glass-money span{white-space:nowrap;font-size:12px}
+ #roundConsole[data-glass] #glassStatus .glass-money b{font-size:15px}
+ #roundConsole[data-glass] #glassStatus .glass-clock small{display:none}
+ #roundConsole[data-glass] #glassStatus .glass-clock strong{font-size:17px}
+
+ /* field mast */
+ #roundConsole #tubeField .field-mast{padding:3px 0;gap:6px;min-height:0}
+ #roundConsole #tubeField[data-ribbon=true] .field-mast{padding:3px 0}
+ #roundConsole .register-title{gap:7px}
+ #roundConsole .register-title small .chance-key{display:none}
+ #roundConsole #tubeField .field-markets button,#roundConsole #tubeField[data-ribbon=true] .field-markets button{min-height:26px;padding:1px 9px}
+
+ /* one line per runner */
+ #roundConsole #tubeField .field-columns{display:none}
+ #roundConsole #tubeField .field-entry,#roundConsole #tubeField[data-sheet=card] .field-entry,
+ #roundConsole #tubeField[data-sheet=compact] .field-entry,#roundConsole #tubeField[data-sheet=pocket] .field-entry,
+ #roundConsole #tubeField[data-sheet=table] .field-entry{
+  display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;grid-template-areas:none;width:100%;flex:0 0 auto;
+  align-items:center;column-gap:7px;row-gap:0;min-height:32px;height:auto;padding:3px 6px;border-radius:3px;margin:0}
+ #roundConsole #tubeRows :is(.entry-id,.entry-style,.entry-chance,.entry-prices){grid-area:auto;grid-row:1;min-height:0;padding:0;border:0;background:none}
+ #roundConsole #tubeRows .entry-id{grid-column:1;display:flex;align-items:center;gap:6px;min-width:0}
+ #roundConsole #tubeRows :is(.entry-id img,.entry-record){display:none}
+ #roundConsole #tubeRows .entry-id b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px;line-height:1.1}
+ #roundConsole #tubeRows .entry-id .cloth{width:1.3em;height:1.3em;min-width:1.3em;font-size:13px;flex:none}
+ #roundConsole #tubeRows .entry-style{grid-column:2;color:#b9cbbd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;min-width:0}
+ #roundConsole #tubeRows .entry-chance{grid-column:3;display:flex;align-items:baseline;gap:3px;justify-content:flex-end;white-space:nowrap}
+ #roundConsole #tubeRows .entry-chance :is(small,i){display:none}
+ #roundConsole #tubeRows .entry-prices{grid-column:4;display:flex;gap:7px;white-space:nowrap}
+ #roundConsole #tubeRows .entry-prices>span{display:flex;align-items:baseline;gap:3px}
+ #roundConsole #tubeRows .entry-prices>span:not(:has(.quoted)){display:none}
+
+ /* the ticket book only takes room when it holds a ticket */
+ #roundConsole #cashBook{margin:0;padding:0 2px 2px;border:0;background:none;min-height:0}
+ #roundConsole #cashBook:not(:has(.cash-entry)){display:none}
+ #roundConsole #cashBook header{padding:2px 4px}
+ #roundConsole #cashBook footer{padding:2px 4px}
+
+ /* hint line and ticket preview */
+ #roundConsole #tubeField .field-foot{padding:2px 0;min-height:0;border-top:1px solid #57758366}
+ #roundConsole #tubeHint{display:none}
+ #roundConsole .screen-slip,#roundConsole[data-glass=field] .screen-slip{padding:3px 6px;minheight:0}
+ #roundConsole[data-glass=field] .screen-slip .slip-who{min-height:28px}
+
+ /* the four keys */
+ #roundConsole .sat-deck,#roundConsole[data-glass=field] .sat-deck{gap:4px;padding:3px 4px;margin-top:2px;display:flex;justify-content:space-between;width:100%;max-width:100%;min-width:0}
+ #roundConsole .sat-deck button,#roundConsole .sat-deck>button{min-height:38px;padding:2px 6px;flex:0 1 auto;font-size:13px;white-space:nowrap}
+ #roundConsole .sat-deck .key-place{flex:0 1 auto}
+ #roundConsole .sat-deck .deck-id{display:none}
+}
+
+/* Narrowest keys: the four captions must stay whole, so they lose 1 px. */
+@media (max-width:365px){
+ #roundConsole .sat-deck button,#roundConsole .sat-deck>button{font-size:12px;padding:2px 3px;white-space:normal;line-height:1.04;flex:1 1 0;min-height:44px}
+ #roundConsole .sat-deck .key-start{margin-right:0}
+}
+/* Pocket glass: the running-style words go first, then the Show quote. */
+@media (max-width:460px){
+ #roundConsole #tubeRows .entry-style{display:none}
+ #roundConsole #tubeField .field-entry{grid-template-columns:minmax(0,1fr) auto auto}
+ #roundConsole #tubeRows .entry-chance{grid-column:2}
+ #roundConsole #tubeRows .entry-prices{grid-column:3}
+ #roundConsole #tubeRows .entry-prices>span:nth-child(2){display:none}
+}
