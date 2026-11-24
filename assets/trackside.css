@@ -117,7 +117,7 @@
 @media(max-height:420px) and (orientation:landscape){#livePanel[data-size=compact] #trackPaper .track-slip{padding:0;min-height:24px}#livePanel[data-size=compact] .bet-guide{padding-block:0}#livePanel[data-size=compact] .bet-basis{padding-block:1px}}
 #livePanel[data-size=pocket] #trackMonitor[data-compact=true] #railBoard li{grid-template-columns:2.1em 1.5em minmax(0,1fr) 1.75em 3.05em}#livePanel[data-size=pocket] #trackMonitor .rail-drive{max-width:100%;padding-inline:0}
 @media(max-width:400px) and (max-height:590px) and (orientation:portrait){#cabinet #viewWindow.has-live-panel:has(#raceBug:not([hidden])) .feed-bottom{right:6px;left:auto;top:53px;bottom:auto;max-width:42cqw}}
-@media(max-width:760px){#cabinet #railBay{container-type:inline-size;max-height:44dvh}#cabinet #railBay #livePanel{max-height:43dvh}}
+@media(max-width:760px){#cabinet #railBay{container-type:inline-size;max-height:73dvh}#cabinet #railBay #livePanel{max-height:72dvh}}
 
 #airTickets .rb-names{min-width:0;color:#e5ead8;font:550 max(11px,.78rem)/1.2 var(--sans);overflow-wrap:anywhere}#airTickets .rb-type,#airTickets .track-legs{flex:none}
 /* The preceding scale was .8: ten percent more on each axis is .88.

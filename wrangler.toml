@@ -1,0 +1,34 @@
+# Cloudflare Workers deployment for the Royal Ascot shared table.
+#
+# The static cabinet is served by Workers Assets; everything under /api/ goes to
+# the worker first, which forwards it to a single SharedTable Durable Object.
+#
+#   npx wrangler deploy
+#   npx wrangler secret put ASCOT_TABLE_CODE   # optional, or set [vars] below
+#
+# Note: the Durable Object uses the SQLite storage backend, which is why the
+# migration below says new_sqlite_classes (a KV-backed class has no storage.sql).
+
+name = "royal-ascot"
+main = "worker/index.js"
+compatibility_date = "2025-06-01"
+
+[assets]
+directory = "."
+binding = "ASSETS"
+# The API must reach the worker before the asset router answers.
+run_worker_first = ["/api/*"]
+
+[[durable_objects.bindings]]
+name = "SHARED_TABLE"
+class_name = "SharedTable"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["SharedTable"]
+
+[vars]
+ASCOT_TABLE_CODE = "ASCOT26"
+
+[observability]
+enabled = true

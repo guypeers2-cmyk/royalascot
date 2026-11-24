@@ -1,11 +1,72 @@
-/* Local tools only. A space-limited authoring checkout may skip the oldest
-   sealed photographs; a source ZIP, hosted export and ordinary clone have
-   them all as regular files. Read ONLY intentionally skipped, named plates
-   from the local Git index. Never fetch or resolve HTTP input through Git. */
-'use strict';const fs=require('node:fs'),path=require('node:path'),{execFileSync}=require('node:child_process');
-function plates(root){const out=new Map(),missing=[];for(const name of require('./registered-plates.json')){const f='assets/'+name;if(!fs.existsSync(path.join(root,f)))missing.push(f);}
- if(!missing.length)return out;if(!fs.existsSync(path.join(root,'.git')))throw Error('Incomplete source: '+missing.join(', '));
- const git=(...args)=>execFileSync('git',['-C',root,...args],{maxBuffer:1024*1024});const rows=new Set(git('ls-files','-t','--',...missing).toString().trimEnd().split('\n'));
- for(const f of missing){if(!rows.has('S '+f))throw Error('Missing, not sparsified: '+f);out.set(path.basename(f),git('cat-file','blob',':'+f));}return out;
+'use strict';
+/* Pre-seals the small WebP "plates" of the cabinet in memory so the self-hosted
+   server can answer the first paint without touching the disk on every request.
+
+   Contract used by serve.mjs:
+     const sealed = sparsePlates(root);
+     sealed.has(name)  -> true only for an /assets plate that exists on disk
+     sealed.get(name)  -> Buffer of that plate
+
+   It is deliberately *sparse*: only plates up to BUDGET bytes are held in RAM.
+   Anything larger (or non-WebP) is left on disk and streamed by serve.mjs, so
+   the process never pins the whole artwork folder. */
+
+const fs = require('node:fs');
+const path = require('node:path');
+
+const BUDGET = 24 * 1024 * 1024;
+
+function sparsePlates(root, { budget = BUDGET, dir = 'assets' } = {}) {
+  const base = path.join(root, dir);
+  let names = [];
+  try {
+    names = fs.readdirSync(base).filter(name => name.toLowerCase().endsWith('.webp'));
+  } catch {
+    names = [];
+  }
+
+  const keep = new Set();
+  let held = 0;
+  const ordered = names.slice().sort((a, b) => {
+    const stat = n => {
+      try { return fs.statSync(path.join(base, n)).size; } catch { return 0; }
+    };
+    return stat(a) - stat(b);
+  });
+  for (const name of ordered) {
+    let size = 0;
+    try { size = fs.statSync(path.join(base, name)).size; } catch { continue; }
+    if (held + size > budget) continue;
+    keep.add(name);
+    held += size;
+  }
+
+  const cache = new Map();
+  const api = {
+    has(name) {
+      const key = String(name || '').replace(/^\/+/, '');
+      if (!keep.has(key)) return false;
+      if (!cache.has(key)) {
+        try { cache.set(key, fs.readFileSync(path.join(base, key))); } catch { return false; }
+      }
+      return true;
+    },
+    get(name) {
+      const key = String(name || '').replace(/^\/+/, '');
+      if (!api.has(key)) return undefined;
+      return cache.get(key);
+    },
+    get size() { return cache.size; },
+    get budget() { return budget; },
+    get held() {
+      let n = 0;
+      for (const buf of cache.values()) n += buf.length;
+      return n;
+    }
+  };
+  return api;
 }
-module.exports=plates;if(require.main===module){const map=plates(path.resolve(__dirname,'..'));process.stdout.write(JSON.stringify(Object.fromEntries(Array.from(map,([f,b])=>[f,b.toString('base64')]))));}
+
+module.exports = sparsePlates;
+module.exports.sparsePlates = sparsePlates;
+module.exports.BUDGET = BUDGET;

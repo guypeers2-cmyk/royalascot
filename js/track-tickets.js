@@ -5,7 +5,7 @@
    list=board.querySelector('ol'),legend=board.querySelector('.rail-legend'),lap=monitor.querySelector('.rail-lap'),count=el.querySelector('.track-count'),slipKey=el.querySelector('button'),boardKey=monitor.querySelector('button'),I=RunnerIntel;
  const drives={boxed:['Ready','Ready','Standing in the starting stall'],saving:['Saving','Save','Saving: cruising between sprints; reserve drains slowly.'],active:['Sprint','Sprint','Sprint: racing at sprint speed and using reserve faster.'],spent:['Spent','Spent','Spent: all scheduled sprints are over. This does not mean the tank is empty.'],finished:['Finished','Fin','Finished'],unknown:['—','—','Sprint not recorded']};
  const cab=$('cabinet'),dockKey=$('railDock'),stopKey=$('railStop'),bay=document.createElement('div');bay.id='railBay';bay.hidden=true;cab.insertBefore(bay,track.nextSibling);
- const isCompact=()=>{const d=document.documentElement?.dataset?.device;return d==='mobile'||(d!=='desktop'&&d!=='tablet'&&window.innerWidth<=680);};
+ const isCompact=()=>{const d=document.documentElement?.dataset?.device;return d==='mobile'||(d!=='desktop'&&window.innerWidth<=680);};
  let docked=isCompact(),manualDock=false;try{const savedDock=localStorage.getItem('ascot-live-position');if(savedDock==='docked'||savedDock==='overlay'){docked=savedDock==='docked';manualDock=true;}}catch{}
  let race=-1,model=null,marketKey='',modelNo=-1,gateWins=null,rows=[],deskRows=[],readings=[],folded=false,boardFolded=false,pin=null,job=0,legKeys=[],deskLegs=[],slots=[];
  try{boardFolded=sessionStorage.getItem('ascot-rail-board')==='folded';}catch{}
@@ -15,13 +15,12 @@
    let room=h-(docked?6:12);if(!docked){const rect=track.getBoundingClientRect(),left=panel.getBoundingClientRect().left,header=track.querySelector('.feed-top').getBoundingClientRect();
      const caps=[$('raceBug'),$('announcement')].filter(e=>!e.hidden).map(e=>e.getBoundingClientRect()).filter(r=>r.right>left-4);
      room=Math.max(48,rect.bottom-Math.max(header.bottom,...caps.map(r=>r.bottom))-12);}
-   const zoom=parseFloat(getComputedStyle(panel).zoom)||1,em=parseFloat(getComputedStyle(document.documentElement).fontSize)||16;
-   const monW=monitor.clientWidth,elW=el.clientWidth,pRect=!docked?panel.getBoundingClientRect():null;
-   const width=monW*2.08;
-   panel.style.setProperty('--rail-room',Math.floor(room/zoom)+'px');
-   el.dataset.paper=elW<185?'narrow':elW<Math.max(280,19*em)?'slim':'table';
-   monitor.dataset.compact=String(monW<320||room<215);panel.dataset.size=width<445?'pocket':width<660?'compact':'full';panel.dataset.shallow=String(room<210);
-   if(pRect){track.style.setProperty('--live-height',pRect.height+'px');track.style.setProperty('--live-width',pRect.width+'px');}
+   // The clearance is measured in screen pixels; max-height is inside the zoomed panel.
+   const zoom=parseFloat(getComputedStyle(panel).zoom)||1;panel.style.setProperty('--rail-room',Math.floor(room/zoom)+'px');// Use the unchanged monitor as breakpoint ruler; a narrower ticket must not
+   // switch the neighbouring race board to a different notation.
+   const width=monitor.clientWidth*2.08;const em=parseFloat(getComputedStyle(document.documentElement).fontSize)||16;el.dataset.paper=el.clientWidth<185?'narrow':el.clientWidth<Math.max(280,19*em)?'slim':'table';
+   monitor.dataset.compact=String(monitor.clientWidth<320||room<215);panel.dataset.size=width<445?'pocket':width<660?'compact':'full';panel.dataset.shallow=String(room<210);if(!docked){track.style.setProperty('--live-height',panel.getBoundingClientRect().height+'px');track.style.setProperty('--live-width',panel.getBoundingClientRect().width+'px');}
+
  }
  function position(on){panel.removeAttribute('data-on-horse');const outside=on&&docked;bay.hidden=!outside;cab.classList.toggle('docked-rail',outside);const host=outside?bay:track;
    if(panel.parentElement!==host)host.append(panel);track.classList.toggle('has-live-panel',on&&!outside);dockKey.setAttribute('aria-pressed',String(outside));

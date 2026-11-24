@@ -32,9 +32,20 @@ window.RoundProgram=function(game,act){
  const resizeFinish=new ResizeObserver(fitFinish);resizeFinish.observe(area);document.fonts?.ready.then(fitFinish);
  let airPager=null,fitFrame=0;const fitAir=()=>{if(!fitFrame)fitFrame=requestAnimationFrame(()=>{fitFrame=0;airPager?.fit();});},airSizer=new ResizeObserver(fitAir);
  let camera=3,finishOpen=false,cardKey='',summaryKey='',lastSecond=-1,lastFinishers=-1,reportId=-1,timeline=null,reportKey='';
- function layers(){const main=false,finish=s.phase==='result'&&finishOpen,trackOnly=camera===7;
+ // The station's own betting glass. It used to be pinned shut, so the console
+ // could never be reached while betting was open.
+ let consoleOpen=false,consolePhase='';
+ function layers(){const main=consoleOpen&&s.phase==='betting',finish=s.phase==='result'&&finishOpen,trackOnly=camera===7;
    tube.hidden=!main;$('finishSlate').hidden=!finish;cab.classList.toggle('console-stage',main);cab.classList.toggle('finish-stage',finish);cab.classList.toggle('track-only-view',trackOnly);cab.parentElement?.classList.toggle('track-only-layout',trackOnly);room.classList.toggle('program-wide',main||finish);
    $('recallFinish').hidden=s.phase!=='result'||finish;$('raceWire').hidden=s.phase!=='race';if(main)glass.queue();if(finish)fitFinish();
+ }
+ function setConsole(open,focus=false){
+   const next=Boolean(open)&&s.phase==='betting';
+   if(next===consoleOpen)return consoleOpen;
+   consoleOpen=next;
+   layers();
+   if(consoleOpen){glass.queue();if(focus)glass.focus(picksForFocus());}
+   return consoleOpen;
  }
  function setCamera(n,manual){camera=n;$('raceBug').hidden=true;lastSecond=-1;if(manual&&s.phase==='result')finishOpen=false;layers()}
  let warmJob=false;let inspectNo=null,selectionKey='',profileKey='',lastPicks=[],lastMarket='win';
@@ -78,6 +89,7 @@ window.RoundProgram=function(game,act){
  }
  tube.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||s.phase!=='betting')return;const d=b.dataset;
    if(d.jump)glass.focus(picksForFocus());else if(d.voidSlip!==undefined)act('cancel',+d.voidSlip);
+   else if(d.tube==='track'){setConsole(false);$('cameraButton')?.focus?.({preventScroll:true});}
    else if(d.tubeMarket)act('market',d.tubeMarket);else if(d.tubePick)act('fieldClick',{n:+d.tubePick,b,e});else if(d.tube)act(d.tube,b);
  });
  function picksForFocus(){return lastPicks.at(-1)||1;}
@@ -92,7 +104,11 @@ window.RoundProgram=function(game,act){
  $('finishSlate').addEventListener('click',e=>{const b=e.target.closest('[data-finish]');if(!b||s.phase!=='result')return;if(b.dataset.finish==='replay'||b.dataset.finish==='winner3d'){finishOpen=false;layers();}act(b.dataset.finish,b);});
  $('recallFinish').onclick=()=>{if(s.phase==='result'){finishOpen=true;layers()}};$('wireReport').onclick=()=>{runnerDesk?.open('calls');act('coverage')};
  $('watchPane').addEventListener('click',e=>{if(e.target.closest('#airStop')){act('fieldView');return;}const detail=e.target.closest('#airOrder [data-file-runner]');if(detail){runnerDesk?.open('files',+detail.dataset.fileRunner);$('airFile').querySelector('[aria-pressed=true]')?.focus({preventScroll:true});return;}const b=e.target.closest('button[data-follow-runner]');if(b&&s.phase==='race')act('follow',+b.dataset.followRunner);});
- function transition(){if(s.phase!=='race'&&s.phase!=='result')CabinetAudio.cutRadio();liveTickets.phase();$('raceBug').hidden=true;if(s.phase!=='race'){airSizer.disconnect();airPager=null;runnerDesk?.destroy();runnerDesk=null;}finishOpen=s.phase==='result';if(finishOpen)drawFinish();reportKey='';lastSecond=-1;summaryKey='';cab.dataset.phase=s.phase;layers();glass.queue();}
+ function transition(){if(s.phase!=='race'&&s.phase!=='result')CabinetAudio.cutRadio();liveTickets.phase();$('raceBug').hidden=true;if(s.phase!=='race'){airSizer.disconnect();airPager=null;runnerDesk?.destroy();runnerDesk=null;}finishOpen=s.phase==='result';if(finishOpen)drawFinish();
+   // A new betting period opens the station's betting glass; the gates close it
+   // again. Only a real phase change moves it, so placing a ticket after the
+   // player has shut the glass does not spring it back open.
+   if(s.phase!==consolePhase){consolePhase=s.phase;consoleOpen=s.phase==='betting';}reportKey='';lastSecond=-1;summaryKey='';cab.dataset.phase=s.phase;layers();glass.queue();}
  let previewKey='';function paddock(){const e=PaddockRadio.cue(s,AscotEngine.names);if(e.key===previewKey)return;previewKey=e.key;
    const key=$('paddockReport');key.textContent=e.n?'Paddock mic · '+e.name+' ›':'Paddock mic · Full card ›';key.title=e.line+' Read all six introductions.';key.setAttribute('aria-label',key.title);
    for(const row of $('tubeRows').children)row.toggleAttribute('data-on-mic',+row.dataset.tubePick===e.n);
@@ -125,5 +141,5 @@ window.RoundProgram=function(game,act){
    }
 
  }
- return{ticket,markTicket:liveTickets.mark,focusField:()=>glass.focus(picksForFocus()),setCamera,transition,report,clock,get inspected(){return inspectNo},get coversTrack(){return !tube.hidden||!$('finishSlate').hidden}};
+ return{ticket,markTicket:liveTickets.mark,focusField:()=>glass.focus(picksForFocus()),setCamera,present:k=>setConsole(k==='console',k==='console'),toggleConsole:()=>setConsole(!consoleOpen,true),get consoleOpen(){return consoleOpen},transition,report,clock,get inspected(){return inspectNo},get coversTrack(){return !tube.hidden||!$('finishSlate').hidden}};
 };})();
