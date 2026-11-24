@@ -45,6 +45,8 @@
   width:100vw;height:100vh;height:100dvh;min-height:0;max-height:none;min-width:0;container-type:normal;overflow:hidden;overscroll-behavior:none;box-shadow:none;border:0;border-radius:0;
 }
 #cabinet.station-full[data-desk]{grid-template-rows:minmax(0,1fr) auto min(54dvh,510px);grid-template-areas:"track" "status" "drawer"}
+#cabinet:not(.station-full)[data-desk] .station-drawer{max-height:min(54dvh,500px);border-top:1px solid #5a6048;border-left:0}
+html[data-device="desktop"] .machine-layout:has(#cabinet[data-desk="bet"]),.machine-layout:has(#cabinet[data-desk="bet"]){grid-template-columns:minmax(0,1fr)}
 #cabinet.station-full .view-window{grid-area:track;min-width:0;min-height:0;width:100%;height:100%;aspect-ratio:auto}
 #cabinet.station-full .race-strip{grid-area:status;min-height:56px;padding:8px max(16px,var(--edge-r)) 8px max(16px,var(--edge-l));background:linear-gradient(90deg,#1b251c,#172119);border-block:1px solid #394735}
 #cabinet.station-full .feed-top{top:max(12px,env(safe-area-inset-top,0px));right:max(13px,var(--edge-r))}
@@ -373,6 +375,10 @@ html[data-device="tablet"] .seat-locator,html[data-device="tablet"] .stake-adjus
 html[data-device="desktop"] .wrap{width:min(1512px,calc(100% - clamp(48px,7.6vw,128px)))}
 html[data-device="desktop"] .machine-layout{display:grid;grid-template-columns:minmax(0,1fr) clamp(310px,26.2vw,393px);gap:18px;align-items:stretch}
 html[data-device="desktop"] .runner-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+html[data-device="desktop"] .card-style{color:#c5ceba}
+html[data-device="desktop"] .terminal .field-label{color:#cdd4c2}
+html[data-device="desktop"] #cabinet .players-menu{opacity:.96;background:#121d16;box-shadow:0 10px 26px rgba(0,0,0,.68)}
+html[data-device="desktop"] :is(.live-label,.cam-label,.glass-square,.camera-button,.race-announcement,.toast){backdrop-filter:none}
 @media(max-height:820px){html[data-device="desktop"] .intro{padding:14px 0 12px}html[data-device="desktop"] .view-window{min-height:0;max-height:56dvh}html[data-device="desktop"] .racecard-section{margin-top:16px}}
 @media(max-width:860px){html[data-device="desktop"] .wrap{width:calc(100% - 24px)}html[data-device="desktop"] .machine-layout{display:flex;flex-direction:column;gap:14px}html[data-device="desktop"] .view-window{min-height:0;height:clamp(260px,45dvh,410px)}html[data-device="desktop"] .runner-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 

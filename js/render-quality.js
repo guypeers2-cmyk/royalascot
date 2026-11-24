@@ -2,12 +2,12 @@
    browser, frame rate, camera, local preference or capability information. */
 (function(root){'use strict';const names=['high','medium','low'],key='ascot-render-quality';
  const profiles=[
-   {dpr:2,canvas:2200000,film:840000,orbit:1800000,chase:1250000,seat:2},
+   {dpr:2,canvas:3600000,film:1400000,orbit:3200000,chase:2400000,seat:2},
    {dpr:1.35,canvas:740000,film:350000,orbit:720000,chase:520000,seat:1.15},
    {dpr:1,canvas:340000,film:145000,orbit:280000,chase:210000,seat:.75}
  ].map(Object.freeze);
- function density(w,h,dpr,level,surface){const p=profiles[level],limit=surface==='chase'?1.5:surface==='orbit'?1.75:surface==='film'?1.35:2;return Math.min(dpr||1,p.dpr,limit,Math.sqrt(p[surface]/Math.max(1,w*h)));}
- function hint(memory,cores){const dev=typeof document!=='undefined'?document.documentElement?.dataset?.device:'';const compact=dev==='mobile'||dev==='tablet'||(dev!=='desktop'&&typeof window!=='undefined'&&((window.innerWidth&&window.innerWidth<=760)||window.matchMedia?.('(pointer:coarse)').matches));if(memory>0&&memory<=2||cores>0&&cores<=2)return 2;if(!compact&&memory>=6&&cores>=6)return 0;return 1;}
+ function density(w,h,dpr,level,surface){const p=profiles[level],limit=surface==='chase'?1.85:surface==='orbit'?2:surface==='film'?1.6:2;return Math.min(dpr||1,p.dpr,limit,Math.sqrt(p[surface]/Math.max(1,w*h)));}
+ function hint(memory,cores){const dev=typeof document!=='undefined'?document.documentElement?.dataset?.device:'';const compact=dev==='mobile'||dev==='tablet'||(dev!=='desktop'&&typeof window!=='undefined'&&((window.innerWidth&&window.innerWidth<=760)||window.matchMedia?.('(pointer:coarse)').matches));if(memory>0&&memory<=2||cores>0&&cores<=2)return 2;if(!compact&&dev==='desktop')return 0;if(!compact&&(memory==null||memory>=4)&&(cores==null||cores>=4))return 0;return 1;}
  function create(storage,{deviceMemory,hardwareConcurrency}={}){let initial=hint(deviceMemory,hardwareConcurrency);const best=deviceMemory>0&&deviceMemory<=2?1:0;let mode='auto',floor=0,auto=initial,last=null,n=0,slow=0,ms=0,headroom=0,cool=0;
    try{const v=storage?.getItem(key);if(names.includes(v))mode=v;}catch{}const level=()=>mode==='auto'?Math.max(auto,floor):names.indexOf(mode);
    function windowReset(){ms=n=slow=0;}function reset(){windowReset();last=null;headroom=0;}

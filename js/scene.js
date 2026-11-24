@@ -8,7 +8,7 @@ function makeScene(canvas,machine){const mainCtx=canvas.getContext('2d',{alpha:f
  function signalQuality(){const v=canvas.parentNode;v.dataset.quality=quality.mode;v.dataset.renderTier=quality.label;}signalQuality();
  // Keep decoded sprite sheets, not six alternating giant WebP sources. Repeated
  // decoding can otherwise consume the entire 320 ms door swing on a CPU canvas.
- const castShadows=[],miniAtlas=[],fullAtlas=[],hi=navigator.deviceMemory<=2 ? .5 : (navigator.deviceMemory<=4||Math.min(innerWidth,innerHeight)<=620) ? .75 : 1;
+ const castShadows=[],miniAtlas=[],fullAtlas=[],isDesktop=document.documentElement?.dataset?.device==='desktop',hi=navigator.deviceMemory<=2 ? .5 : (!isDesktop&&(navigator.deviceMemory<=4||Math.min(innerWidth,innerHeight)<=620)) ? .75 : 1;
  function sheet(src,f){const a=document.createElement('canvas');a.width=Math.round((src.naturalWidth||src.width)*f);a.height=Math.round((src.naturalHeight||src.height)*f);const g=a.getContext('2d',{willReadFrequently:true});g.imageSmoothingQuality='medium';g.drawImage(src,0,0,a.width,a.height);return a;}
  // Decode one shared outline and five pigment grades only once. No pixel
  // readback, texture downloads or WebGL required by the rail/seat views.
