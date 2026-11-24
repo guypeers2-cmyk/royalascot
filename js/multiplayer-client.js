@@ -37,6 +37,7 @@
      }
      try{localStorage.setItem(DEVICE,mode);}catch{}
      syncPlayersMenuOpen();
+     try{root.dispatchEvent(new CustomEvent('ascot:device-mode',{detail:mode}));}catch{}
      try{root.dispatchEvent(new Event('resize'));}catch{}
    }
    applyDeviceMode(currentDevice);
@@ -340,7 +341,8 @@
      document.body.append(gate);
      const style=document.createElement('style');
      style.textContent=`
-       #sharedTableGate{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:18px;background:rgba(7,14,11,.92);backdrop-filter:blur(8px);font-family:system-ui,sans-serif;color:#f3ecd8;overflow-y:auto}
+       #sharedTableGate{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:18px;background:rgba(7,14,11,.94);font-family:system-ui,sans-serif;color:#f3ecd8;overflow-y:auto}
+       html[data-device="desktop"] #sharedTableGate{background:rgba(7,14,11,.90);backdrop-filter:blur(6px)}
        #sharedTableGate[hidden]{display:none}
        .shared-gate-card{box-sizing:border-box;width:min(100%,520px);padding:clamp(20px,4vw,34px);background:linear-gradient(145deg,#1b3025,#101c17);border:1px solid #a88b58;border-radius:14px;box-shadow:0 24px 90px #0009}
        .shared-gate-top{display:flex;align-items:center;justify-content:space-between;gap:10px}

@@ -329,7 +329,8 @@ html[data-device="mobile"] .balance{padding:3px 7px;gap:6px}
 html[data-device="mobile"] .balance small{font-size:9.5px}
 html[data-device="mobile"] .balance-total b{font-size:15px}
 html[data-device="mobile"] .machine-layout{display:flex;flex-direction:column;gap:10px}
-html[data-device="mobile"] .view-window{flex:none;min-height:220px;aspect-ratio:1.5;width:100%}
+html[data-device="mobile"] .view-window{flex:none;height:clamp(210px,34dvh,295px);min-height:0;aspect-ratio:auto;width:100%}
+html[data-device="mobile"] :is(.live-label,.cam-label,.glass-square,.camera-button,.race-announcement,.toast){backdrop-filter:none}
 html[data-device="mobile"] .terminal{padding:12px 11px 6px}
 html[data-device="mobile"] .market-pane{display:flex;flex-direction:column;gap:10px}
 html[data-device="mobile"] .stake-field{margin-top:0}
@@ -344,19 +345,36 @@ html[data-device="mobile"] .chip{height:38px}
 html[data-device="mobile"] .chip svg{width:30px;height:30px}
 html[data-device="mobile"] .chip.active:before{width:35px;height:35px}
 
-html[data-device="tablet"] .wrap{width:min(860px,calc(100% - 32px))}
-html[data-device="tablet"] .machine-layout{display:flex;flex-direction:column;gap:15px}
-html[data-device="tablet"] .view-window{flex:none;min-height:0;aspect-ratio:1.84;width:100%}
-html[data-device="tablet"] .terminal{padding:17px 17px 0}
+html[data-device="tablet"] .wrap{width:min(880px,calc(100% - 28px))}
+html[data-device="tablet"] .topbar{height:60px;gap:20px}
+html[data-device="tablet"] .intro{padding:13px 0 12px}
+html[data-device="tablet"] .machine-layout{display:flex;flex-direction:column;gap:13px}
+html[data-device="tablet"] .view-window{flex:none;height:clamp(270px,44dvh,420px);min-height:0;aspect-ratio:auto;width:100%}
+html[data-device="tablet"] :is(.live-label,.cam-label,.glass-square,.camera-button,.race-announcement,.toast){backdrop-filter:none}
+html[data-device="tablet"] #cabinet .feed-top .glass-square{width:36px;height:36px}
+html[data-device="tablet"] #cabinet .camera-button,html[data-device="tablet"] #cabinet .players-button{min-height:36px;padding:6px 10px;font-size:12px}
+html[data-device="tablet"] #cabinet .orbit-tools button{width:32px;height:32px}
+html[data-device="tablet"] #cabinet .nose-aim select,html[data-device="tablet"] #cabinet .nose-step,html[data-device="tablet"] #cabinet .nose-fx,html[data-device="tablet"] #cabinet .overview-pip-btn{min-height:32px}
+html[data-device="tablet"] #cabinet #livePanel{width:min(34rem,calc(100% - 8.5rem))}
+html[data-device="tablet"] .terminal{padding:15px 15px 4px}
 html[data-device="tablet"] .market-pane{display:grid;grid-template-columns:1fr 1fr;column-gap:16px}
 html[data-device="tablet"] .market-tabs,html[data-device="tablet"] .price-line,html[data-device="tablet"] .place-button{grid-column:1/-1}
+html[data-device="tablet"] .market-tabs button{min-height:38px;font-size:13px}
+html[data-device="tablet"] .runner-choice{min-height:44px}
+html[data-device="tablet"] .place-button{min-height:44px;font-size:14px}
+html[data-device="tablet"] .chip{height:44px}
+html[data-device="tablet"] .chip svg{width:36px;height:36px}
+html[data-device="tablet"] .chip.active:before{width:41px;height:41px}
 html[data-device="tablet"] .stake-field{margin-top:0}
 html[data-device="tablet"] .runner-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-html[data-device="tablet"] .seat-locator{display:none}
+html[data-device="tablet"] .horse-card{padding:11px}
+html[data-device="tablet"] .seat-locator,html[data-device="tablet"] .stake-adjust{display:none}
 
 html[data-device="desktop"] .wrap{width:min(1512px,calc(100% - clamp(48px,7.6vw,128px)))}
 html[data-device="desktop"] .machine-layout{display:grid;grid-template-columns:minmax(0,1fr) clamp(310px,26.2vw,393px);gap:18px;align-items:stretch}
 html[data-device="desktop"] .runner-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+@media(max-height:820px){html[data-device="desktop"] .intro{padding:14px 0 12px}html[data-device="desktop"] .view-window{min-height:0;max-height:56dvh}html[data-device="desktop"] .racecard-section{margin-top:16px}}
+@media(max-width:860px){html[data-device="desktop"] .wrap{width:calc(100% - 24px)}html[data-device="desktop"] .machine-layout{display:flex;flex-direction:column;gap:14px}html[data-device="desktop"] .view-window{min-height:0;height:clamp(260px,45dvh,410px)}html[data-device="desktop"] .runner-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 
 /* Sound mix menu & folio controls */
 .sound-wrap,.console-sound-wrap{position:relative;display:flex;align-items:center;gap:2px;pointer-events:auto}
@@ -446,7 +464,7 @@ html[data-device="mobile"] #cabinet .picture-menu,html[data-device="mobile"] .so
 html[data-device="mobile"] #cabinet .picture-menu button,html[data-device="mobile"] .sound-menu button{min-height:36px;height:auto;padding:7px 9px;font-size:12.5px}
 html[data-device="mobile"] #cabinet .overview-pip{width:154px;padding:5px 7px;top:40px;right:6px}
 html[data-device="mobile"] #cabinet .overview-pip li{font-size:10.5px}
-html[data-device="mobile"] #cabinet.docked-rail #railBay{max-height:none;padding:6px;background:#132018;border-top:1px solid #4c5d49}
+html[data-device="mobile"] #cabinet.docked-rail #railBay{max-height:41dvh;overflow-y:auto;padding:6px;background:#132018;border-top:1px solid #4c5d49}
 html[data-device="mobile"] #cabinet.docked-rail #railBay #livePanel{width:100%;max-height:none;display:grid;grid-template-columns:1fr;gap:6px;background:#17271d;border-color:#5f7058}
 html[data-device="mobile"] #cabinet.docked-rail #railBay #livePanel #trackTickets{border-right:0;border-bottom:1px solid #475a45;padding-bottom:4px}
 html[data-device="mobile"] #cabinet.docked-rail #railBay #livePanel #trackMonitor{grid-column:1;grid-row:auto}

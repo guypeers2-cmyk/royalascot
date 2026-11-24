@@ -112,6 +112,7 @@ function makeScene(canvas,machine){const mainCtx=canvas.getContext('2d',{alpha:f
  function picture(v){if(!['auto','3d','film'].includes(v))return;actionPref=v;slowDevice=false;try{localStorage.setItem('ascot-action-picture',v);}catch{}if(c===6)lens(6);}
  function applyQuality(){signalQuality();filmLevel=quality.level;filmDue=0;budget.reset();if(c===6)lens(6);else {if(c===3||c===7||c===8)orbit?.setAction(orbitModeFor(c),quality.level);size();}}
  function selectQuality(v){if(quality.set(v)){slowDevice=false;applyQuality();}}
+ window.addEventListener('ascot:device-mode',()=>{if(quality.refreshHint?.())applyQuality();else size();});
  document.addEventListener('visibilitychange',()=>{budget.reset();quality.reset();});
  function framing(w,x0,x1,y0,y1){const {top,bottom}=aperture,k=Math.max(.06,Math.min((cw-8)/(x1-x0),Math.max(22,bottom-top)/(y1-y0)));return {k,x:(cw-k*(x1+x0))/2,y:(top+bottom-k*(y0+y1))/2};}
  // An honest mount when a whole photographic plate fits inside the glass.
