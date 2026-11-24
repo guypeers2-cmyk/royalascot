@@ -36,10 +36,10 @@ window.CabinetFigurines=function(arena){const T=THREE,D=data||(data=CarrierMeshD
      p[j]=x+q.plantX+dx*amp;p[j+1]=Math.max(q.hind&&amp?.016:.024,y+q.plantY+dy*amp);p[j+2]=q.z+(q.tail*.0105*b+q.withers*.002*a)*amp*.52;
      if(q.leg&&y<.16)lowest=Math.min(lowest,sy*p[j]+cy*p[j+1]+sz*p[j+2]);
      const co=1-.5*bend*bend,si=bend*(1-bend*bend/6);normals[j]=co*restN[j]-si*restN[j+1];normals[j+1]=si*restN[j]+co*restN[j+1];normals[j+2]=restN[j+2];
-   }if(amp===0)g.computeVertexNormals();body.rotation.set(rx,0,rz);body.position.y=.0015-lowest;
+   }if(amp===0&&!fastNormals)g.computeVertexNormals();body.rotation.set(rx,0,rz);body.position.y=.0015-lowest;
  }
  function trotBank(bank){if(!bank)return;const co=1/Math.cos(bank)-1,si=Math.tan(bank);for(let i=0,j=0;i<loadRoll.length;i++,j+=3)if(loadRoll[i])p[j+1]+=loadRoll[i]*(co*p[j+1]+si*p[j+2]);}
- function stepTrot(theta,amp,bank){const t=theta/TAU,beat=Math.cos(2*theta+Math.PI/4),s=Math.sin(2*theta),b=Math.sin(2*theta+Math.PI/4),hind=[G.trot(t,false,0,amp),G.trot(t,false,1,amp)],fore=[G.trot(t,true,0,amp),G.trot(t,true,1,amp)],m=phases.map((v,i)=>G.trotPose(...(v>2.8?fore:hind),sides[i]));
+ function stepTrot(theta,amp,bank,fastNormals=false){const t=theta/TAU,beat=Math.cos(2*theta+Math.PI/4),s=Math.sin(2*theta),b=Math.sin(2*theta+Math.PI/4),hind=[G.trot(t,false,0,amp),G.trot(t,false,1,amp)],fore=[G.trot(t,true,0,amp),G.trot(t,true,1,amp)],m=phases.map((v,i)=>G.trotPose(...(v>2.8?fore:hind),sides[i]));
    for(let i=0,j=0;i<parts.length;i++,j+=3){const q=parts[i],px=q.x+q.plantX,py=Math.max(G.floor,q.y+q.plantY);let x=px,y=py;
      if(q.attach){G.trotSample(m[q.id],q.trot,result);x+=q.attach*(result[0]-px);y+=q.attach*(result[1]-py);}
      // A quiet back, with two small withers/neck responses per stride. No
@@ -48,18 +48,19 @@ window.CabinetFigurines=function(arena){const T=THREE,D=data||(data=CarrierMeshD
      // A partial first step has a partial hoof rotation, not a linear blend
      // of two soles (which lifts the weight-bearing heel at low effort).
      if(amp<1&&q.trot?.shoe){const k=m[q.id].sole,b=q.trot,w=b.shoe*q.attach;p[j]+=w*(k[0]+k[2]*b.toeX-k[3]*b.toeY);p[j+1]+=w*(k[1]+k[3]*b.toeX+k[2]*b.toeY+(1-amp)*(G.floor+b.toeY-py));}}
-   trotBank(bank);g.computeVertexNormals();body.rotation.set(bank,0,0);body.position.y=.0015-G.floor+amp*G.trunk(t);
+   trotBank(bank);if(!fastNormals)g.computeVertexNormals();else{const k0=cell(Math.floor(((theta/TAU)%1+1)%1*64),false),N=p.length,rn=1-amp,kn=amp/16000;for(let j=0;j<N;j++)normals[j]=rn*restN[j]+kn*k0[N+j];}body.rotation.set(bank,0,0);body.position.y=.0015-G.floor+amp*G.trunk(t);
  }
- function setPhase(theta,amp=1,walk=false,bank=0){if(walk||!amp)stepWalk(theta,amp,bank);else stepTrot(theta,amp,bank);bike.update(theta,amp,walk);g.attributes.position.needsUpdate=g.attributes.normal.needsUpdate=true;}
+ let fastNormals=false;
+ function setPhase(theta,amp=1,walk=false,bank=0){if(walk||!amp)stepWalk(theta,amp,bank);else stepTrot(theta,amp,bank,fastNormals);bike.update(theta,amp,walk);g.attributes.position.needsUpdate=g.attributes.normal.needsUpdate=true;}
  // One shared, lazily developed pose palette for the entire moving field.
  // Keep every vertex, silhouette, UV and moving physical shadow. Interpolate
  // across the wrap, not between discrete displayed frames. Bank compensation
  // is applied after interpolation; a race flight is never pinned to the turf. The exact solver
  // above remains authoritative for starting effort and photographic stock.
  const soles=[];for(let j=0;j<parts.length;j++)if(parts[j].leg&&parts[j].y<.16)soles.push(j*3);
- function cell(k,walk){const bank=walk?sharedPalettes.walk:sharedPalettes.trot;if(bank[k])return bank[k];setPhase(k*TAU/64,1,walk,0);const v=new Int16Array(p.length*2);for(let j=0;j<p.length;j++){v[j]=Math.round(p[j]*32766);v[j+p.length]=Math.round(normals[j]*16000);}return bank[k]=v;}
+ function cell(k,walk){const bank=walk?sharedPalettes.walk:sharedPalettes.trot;if(bank[k])return bank[k];const prev=fastNormals;fastNormals=false;setPhase(k*TAU/64,1,walk,0);fastNormals=prev;const v=new Int16Array(p.length*2);for(let j=0;j<p.length;j++){v[j]=Math.round(p[j]*32766);v[j+p.length]=Math.round(normals[j]*16000);}return bank[k]=v;}
  if(!warmSolver)warmSolver=(k,walk)=>cell(k,walk);
- function move(theta,amp,walk,bank){if(amp!==1){setPhase(theta,amp,walk,bank);return;}const u=((theta/TAU)%1+1)%1*64,k=Math.floor(u),f=u-k,A=cell(k,walk),B=cell((k+1)%64,walk),N=p.length;
+ function move(theta,amp,walk,bank){if(amp!==1){fastNormals=true;setPhase(theta,amp,walk,bank);fastNormals=false;return;}const u=((theta/TAU)%1+1)%1*64,k=Math.floor(u),f=u-k,A=cell(k,walk),B=cell((k+1)%64,walk),N=p.length;
    const p0=(1-f)/32766,p1=f/32766,n0=(1-f)/16000,n1=f/16000;for(let j=0;j<N;j++){p[j]=p0*A[j]+p1*B[j];normals[j]=n0*A[N+j]+n1*B[N+j];}
    if(walk){const a=Math.sin(theta),rz=.010*Math.sin(theta*2+.32),rx=bank+.009*a,sy=Math.cos(rx)*Math.sin(rz),cy=Math.cos(rx)*Math.cos(rz),sz=-Math.sin(rx);let low=Infinity;for(const j of soles)low=Math.min(low,sy*p[j]+cy*p[j+1]+sz*p[j+2]);body.rotation.set(rx,0,rz);body.position.y=.0015-low;}
    else{trotBank(bank);body.rotation.set(bank,0,0);body.position.y=.0015-G.floor+G.trunk(theta/TAU);}bike.update(theta,amp,walk);g.attributes.position.needsUpdate=g.attributes.normal.needsUpdate=true;

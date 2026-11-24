@@ -147,7 +147,13 @@
      }
    }
 
+   let lastStatusKey='';
    function setStatus(offline=false){
+     const activePlayers=onlineNames.filter(x=>x&&x.online!==false);
+     const isSignedIn=enabled?joined:!!localUser;
+     const statusKey=[enabled,offline,isSignedIn,tableCode,game.state?.phase,profile?.ready,activePlayers.map(x=>x.id+':'+x.name+':'+Math.round(x.balance||0)+':'+Boolean(x.ready)+':'+(x.bets?.length||0)+':'+(x.bets||[]).map(b=>b.market+b.nums+b.stake).join(',')).join('|')].join('~');
+     if(statusKey===lastStatusKey&&!hoveredPlayerId)return;
+     lastStatusKey=statusKey;
      updatePlayerBadge();
      syncReadyButtons();
      const wrap=$('playersWrap'),btn=$('playersButton'),cnt=$('playersCount'),list=$('playersList'),codeEl=$('playersTableCode'),copy=$('playersCopyCode');
@@ -157,9 +163,7 @@
      if(!active)return;
      btn.dataset.offline=String(offline);
      if(copy)copy.hidden=!enabled;
-     const isSignedIn=enabled?joined:!!localUser;
      if(!isSignedIn){if(cnt)cnt.textContent='Login';if(list)list.innerHTML='';hoveredPlayerId='';renderHoveredBets();syncPlayersMenuOpen();return;}
-     const activePlayers=onlineNames.filter(x=>x&&x.online!==false);
      const n=activePlayers.length;
      if(cnt)cnt.textContent=enabled?`${n} active`:'Local only';
      if(codeEl)codeEl.textContent=enabled?(tableCode||''):'OFFLINE · NO SERVER';
@@ -555,14 +559,31 @@
      }
    }
 
-   function phaseEvent(before,after){if(!before)return after.phase==='betting'?'new':after.phase==='gates'?'gates':after.phase==='race'?'race':'result';if(before.raceNo!==after.raceNo)return 'new';if(before.phase!==after.phase){if(after.phase==='betting')return 'new';return after.phase;}if(after.phase==='gates'&&before.boxCall!==after.boxCall&&after.boxCall)return 'boxed';if(before.balance!==after.balance||JSON.stringify(before.bets)!==JSON.stringify(after.bets))return 'bet';return '';}
-   let pollTimer=null;function startPolling(){if(!pollTimer)pollTimer=setInterval(poll,220);}
-   function accept(payload){if(!payload?.state)return;const state=payload.state;onlineNames=payload.players||[];profile=payload.player||profile;tableCode=payload.tableCode||tableCode;const sound=game.state.sound;const previous=oldState?JSON.parse(JSON.stringify(oldState)):null;applySnapshot({...state,sound});oldState=game.state;revision=payload.revision??revision;lastFresh=Date.now();joined=true;enabled=true;setStatus(false);if(gate)gate.hidden=true;const type=phaseEvent(previous,state);if(type&&callback)callback(type);startPolling();}
-   async function poll(){if(!joined||polling)return;polling=true;try{const r=await fetch('/api/state',{headers:headers(),cache:'no-store'});if(r.status===401){joined=false;enabled=true;setStatus(true);showGate('login','Your saved seat is no longer available. Log in with username & 4-digit PIN.');return;}if(!r.ok)throw Error('Connection to the table was interrupted.');const data=await r.json();accept(data);}catch(err){setStatus(true);if(Date.now()-lastFresh>10000&&gate){gate.hidden=false;gate.querySelector('output').textContent='Reconnecting to the host…';}}finally{polling=false;}}
-   async function command(action,data={}){if(!joined)return;try{const result=await post('/api/action',{action,data});accept(result);}catch(err){notify(err.message);}}
+   function snapSummary(st){if(!st)return null;return {raceNo:st.raceNo,phase:st.phase,boxCall:Boolean(st.boxCall),balance:st.balance,betsKey:(st.bets||[]).map(b=>b.market+':'+(b.nums||[]).join(',')+':'+b.stake).join('|')};}
+   function phaseEvent(before,after){if(!before)return after.phase==='betting'?'new':after.phase==='gates'?'gates':after.phase==='race'?'race':'result';if(before.raceNo!==after.raceNo)return 'new';if(before.phase!==after.phase){if(after.phase==='betting')return 'new';return after.phase;}if(after.phase==='gates'&&before.boxCall!==after.boxCall&&after.boxCall)return 'boxed';const afterKey=(after.bets||[]).map(b=>b.market+':'+(b.nums||[]).join(',')+':'+b.stake).join('|');if(before.balance!==after.balance||before.betsKey!==afterKey)return 'bet';return '';}
+   let pollTimer=null,clockDrift=0;
+   function schedulePoll(){clearTimeout(pollTimer);if(!joined)return;const ph=game.state?.phase;const ms=(ph==='race'||ph==='gates')?450:320;pollTimer=setTimeout(poll,ms);}
+   function accept(payload,reqMs=0){if(!payload?.state)return;const state=payload.state;onlineNames=payload.players||[];profile=payload.player||profile;tableCode=payload.tableCode||tableCode;const sound=game.state.sound;const prev=joined&&oldState?snapSummary(oldState):null;
+     const sameRound=Boolean(prev&&prev.raceNo===state.raceNo&&prev.phase===state.phase&&prev.boxCall===Boolean(state.boxCall));
+     const rtt=reqMs?Math.max(0,Date.now()-reqMs):0;
+     const targetClock=(Number(state.clock)||0)+Math.min(.32,rtt/2000);
+     if(sameRound){
+       if(Number.isFinite(state.balance))game.state.balance=state.balance;
+       if(Array.isArray(state.bets))game.state.bets=state.bets;
+       if(Number.isFinite(state.payout))game.state.payout=state.payout;
+       if(state.boxCall!==undefined)game.state.boxCall=state.boxCall;
+       const drift=targetClock-(Number(game.state.clock)||0);
+       if(Math.abs(drift)>1.15){game.state.clock=targetClock;clockDrift=0;}else{clockDrift=drift;}
+     }else{
+       applySnapshot({...state,clock:targetClock,sound});
+       clockDrift=0;
+     }
+     oldState=game.state;revision=payload.revision??revision;lastFresh=Date.now();joined=true;enabled=true;setStatus(false);if(gate)gate.hidden=true;const type=phaseEvent(prev,state);if(type&&callback)callback(type);schedulePoll();}
+   async function poll(){if(!joined||polling)return;polling=true;const reqAt=Date.now();try{const r=await fetch('/api/state',{headers:headers(),cache:'no-store'});if(r.status===401){joined=false;enabled=true;setStatus(true);showGate('login','Your saved seat is no longer available. Log in with username & 4-digit PIN.');return;}if(!r.ok)throw Error('Connection to the table was interrupted.');const data=await r.json();accept(data,reqAt);}catch(err){setStatus(true);if(Date.now()-lastFresh>10000&&gate){gate.hidden=false;gate.querySelector('output').textContent='Reconnecting to the host…';}schedulePoll();}finally{polling=false;}}
+   async function command(action,data={}){if(!joined)return;const reqAt=Date.now();try{const result=await post('/api/action',{action,data});accept(result,reqAt);}catch(err){notify(err.message);}}
    function activateServer(){if(enabled)return;enabled=true;game.remote=true;bindPlayersMenu();setStatus(true);}
 
-   game.tick=dt=>{if(!enabled){if(gate&&!gate.hidden)return;return original.tick(dt);}if(joined&&Date.now()-lastFresh<900&&Number.isFinite(dt)&&dt>0)game.state.clock+=Math.min(dt,.08);};
+   game.tick=dt=>{if(!enabled){if(gate&&!gate.hidden)return;return original.tick(dt);}if(joined&&Date.now()-lastFresh<2000&&Number.isFinite(dt)&&dt>0){const step=Math.min(dt,.05);let adj=0;if(clockDrift){adj=Math.max(-step*.35,Math.min(step*.65,clockDrift*Math.min(1,step*3.2)));clockDrift-=adj;}let nextClock=game.state.clock+step+adj;if(game.state.phase==='betting'){const cap=Math.max(0,(game.state.openSeconds||60)-.05);if(nextClock>cap)nextClock=cap;}game.state.clock=nextClock;}};
    game.place=(market,nums,amount)=>{if(!enabled){const res=original.place(market,nums,amount);if(!res)saveLocalProfile();return res;}command('place',{market,nums,amount});return null;};
    game.cancel=i=>{if(!enabled){const ok=original.cancel(i);if(ok)saveLocalProfile();return ok;}if(!joined)return false;command('cancel',{index:i});return true;};
    game.close=(...args)=>enabled?command('ready'):original.close(...args);
